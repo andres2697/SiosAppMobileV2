@@ -1,97 +1,42 @@
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View, TouchableOpacity, ImageBackground, SafeAreaView } from "react-native";
 import React, { Component } from "react";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../database/firebase";
 import { KeyboardAvoidingView } from "react-native";
-import { TextInput } from "react-native-paper";
 import fondo from "../assets/img/fondo.png";
-// import { createIconSetFromIcoMoon } from '@expo/vector-icons';
-// import { useFonts } from 'expo-font';
-// import AppLoading from 'expo-app-loading';
 import SvgComponent from '../assets/img/svg/logo_svg.js';
-import Correo from "./components/Correo.js";
-import Contrasenia from "./components/Contrasenia.js";
-import AppLoading from "expo-app-loading";
-
-
-
+import LoginForm  from './components/LoginForm.js';
 
 
 class Login extends React.Component {
-  // iniciarSesion = () => {
-    // signInWithEmailAndPassword(auth, "adpanfilo@ioscomunicaciones.com", "1234567")
-    //   .then((userCredentials) => {
-    //     console.log("login");
-    //   })
-    //   .catch((error) => {
-      //     console.log(error);
-    //   });
-  //   console.log('pass');
-  // };
   constructor(props){
     super(props);
     this.state = {
-
     }
   }
   render(){
-    return (<Correo></Correo>);
-    // return (<Text>Hola Mundo</Text>);
+    return (
+        <KeyboardAvoidingView
+          style={styles.container}
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+           keyboardVerticalOffset={-220}>
+    
+          <ImageBackground resizeMode="cover" source={fondo} style={styles.imagen}>
+            <View style={styles.containerGeneral}>
+              <View style={[styles.viewsContainer, styles.inputContainer]}>
+                        {/* <Logo/> */}
+                <View style={styles.contenedorLogo}>
+                  <SvgComponent></SvgComponent>
+                </View>
+                <LoginForm></LoginForm>
+              </View>
+              <View style={{paddingBottom: 30}}>
+                <Text> IOS Comunicaciones 2022 </Text>
+              </View>
+            </View>
+          </ImageBackground>
+        </KeyboardAvoidingView>
+    );
   }
-  // constructor(props){
-  //   super(props);
-  //   this.state = {
-  //     correo: "",
-  //         callbackFunction: (childData) => {
-  //           this.setState({correo: childData})
-  //         },
-  //   }
-
-  // }
-  // render(){
-  //   return (
-  //           // <SafeAreaView style={styles.containerSA}>
-  //           // <KeyboardAwareScrollView
-  //           //   resetScrollToCoords={{ x: 0, y: 0 }}
-  //           //   contentContainerStyle={styles.containerL}
-  //           //   scrollEnabled
-  //           // >
-  //     <KeyboardAvoidingView
-  //       style={styles.container}
-  //       behavior={Platform.OS === "ios" ? "padding" : "height"}
-  //        keyboardVerticalOffset={-220}>
-  
-  //       <ImageBackground resizeMode="cover" source={fondo} style={styles.imagen}>
-  //         <View style={styles.containerGeneral}>
-  //           <View style={[styles.viewsContainer, styles.inputContainer]}>
-  //                     {/* <Logo/> */}
-  //             <View style={styles.contenedorLogo}>
-  //               <SvgComponent></SvgComponent>
-  //             </View>
-  //             {/* <CorreoInput></CorreoInput> */}
-  //             {/* <CorreoInput parentCallback = {()=>this.callbackFunction()}></CorreoInput> */}
-  //             {/* <ContraseniaInput></ContraseniaInput> */}
-  //             <Text>{this.state.correo}</Text>
-  //           </View>
-  //           <View style={[styles.buttonContainer]}>
-  //             <TouchableOpacity
-  //               style={styles.button}
-  //               onPress={() => iniciarSesion()}
-  //             >
-  //               <Text style={styles.buttonText}>Iniciar Sesion</Text>
-  //             </TouchableOpacity>
-  //           </View>
-  //           <View style={{paddingBottom: 30}}>
-  //             <Text> IOS Comunicaciones 2022 </Text>
-  //           </View>
-  //         </View>
-  //       </ImageBackground>
-  //     </KeyboardAvoidingView>
-            // </KeyboardAwareScrollView>
-        // </SafeAreaView>
-  //   );
-  // }
 }
   
 export default Login;
@@ -121,11 +66,11 @@ const styles = StyleSheet.create({
     borderRadius: 15,
   },
   contenedorLogo: {
-    marginBottom: 50
+    marginBottom: 60
   },
   viewsContainer: {
-    width: "80%",
-    height: 'auto',
+    width: "90%",
+    height: '100%',
     justifyContent: "center",
     alignItems: "center",
   },
@@ -139,24 +84,6 @@ const styles = StyleSheet.create({
   test: {
     width: 100,
     height: 50,
-  },
-  buttonContainer: {
-    width: "80%",
-    flex: 1,
-    marginTop: '25%',
-    justifyContent: "flex-start",
-    alignItems: "center",
-  },
-  button:{
-    backgroundColor: '#2166E5',
-    paddingTop: 10,
-    paddingBottom: 10,
-    paddingLeft: 20,
-    paddingRight: 20,
-    borderRadius:20,
-  },
-  buttonText:{
-      color: 'white'
   },
   imagen: {
     // flex: 1,
