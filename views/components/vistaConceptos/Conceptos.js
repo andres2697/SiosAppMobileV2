@@ -41,6 +41,9 @@ import {
     return (
         <ScrollView style={styles.contenedorPrincipal}>
             <View style={styles.contenedorPrincipal}>
+              <View style={{ paddingTop: 30, paddingBottom: 20, width: '85%', alignSelf: "center" }}>
+                  <Text style={{ fontSize: 16, fontWeight: '700' }}>Folio: {folio}</Text>
+              </View>
                 <View style={ styles.contenedorCab24 }>
                     <Cab24 folio={folio} tipoMaterial='2'></Cab24>
                 </View>
@@ -66,7 +69,7 @@ import {
         backgroundColor: "white",
         width: "100%",
         height: "100%",
-        paddingTop: 20,
+        // paddingTop: 20,
         paddingBottom: '10%',
       },
       contenedorCab24: {
@@ -74,7 +77,7 @@ import {
         flexDirection: "column",
         alignSelf: 'flex-end',
         marginTop: 10,
-        marginBottom: 25,
+        marginBottom: 50,
         marginRight: '7%',
 
       },

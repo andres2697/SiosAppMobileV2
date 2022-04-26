@@ -1,4 +1,4 @@
-import {
+  import {
     StyleSheet,
     View,
     Text,
@@ -7,7 +7,8 @@ import {
     FlatList,
     SafeAreaView,
     Dimensions,
-    KeyboardAvoidingView
+    KeyboardAvoidingView,
+    Pressable
   } from "react-native";
   import {AutoGrowingTextInput} from 'react-native-autogrow-textinput';
   import { Ionicons } from '@expo/vector-icons';
@@ -75,19 +76,19 @@ import {
                                 // ListHeaderComponent={() => ( )}
                                 // ListFooterComponent={() => ()}
                                 renderItem={({ item }) => (
-                                    <View style={{ flexDirection: "row" }}>
-                                    <View style={styles.burbujaDeChat}>
-                                      <Text style={{ alignSelf: "flex-end", textAlign: "justify" }}>
-                                        {item.mensaje}
-                                      </Text>
-                                    </View>
-                                    <View style={styles.burbujaUsuario}>
-                                      <Iconos
-                                        name="usuario"
-                                        size={40}
-                                        style={{ alignSelf: "center", paddingLeft: 1 }}
-                                      ></Iconos>
-                                    </View>
+                                    <View style={{ flexDirection: "row", justifyContent: 'flex-end', paddingRight: 2 }}>
+                                        <View style={styles.burbujaDeChat}>
+                                            <Text style={{ alignSelf: "flex-end", textAlign: "justify" }}>
+                                                {item.mensaje}
+                                            </Text>
+                                        </View>
+                                        <View style={styles.burbujaUsuario}>
+                                            <Iconos
+                                                name="usuario"
+                                                size={40}
+                                                style={{ alignSelf: "center", paddingLeft: 1 }}
+                                            ></Iconos>
+                                        </View>
                                   </View>
                                 )}
                                 keyExtractor={(item) => item.keyMensaje}
@@ -106,17 +107,14 @@ import {
                     // })}
                     selectionColor="#2166E5"
                 ></AutoGrowingTextInput>
-                <View style={{ width: '10%', alignItems: 'flex-end', alignContent: 'flex-start', paddingBottom: '3%' }}>
-                    <Ionicons 
-                        name="md-send" 
-                        size={24} 
-                        color="black" 
-                        onPress={ ()=>{
-                            agregarMensaje();
-                            // console.log('reescribiendo');
-                        }}
-                    />
-                </View>
+                <Pressable 
+                    style={ styles.contenedorBoton }
+                    onPress={ ()=>{
+                        agregarMensaje();
+                    }}
+                >
+                    <Ionicons name="md-send" size={24} color="black" />
+                </Pressable>
             </View>
         </KeyboardAvoidingView>
     );
@@ -154,7 +152,7 @@ import {
         flexDirection: 'row'
       },
       burbujaDeChat: {
-        width: '80%', 
+        maxWidth: '80%', 
         height: 'auto',  
         elevation: 3, 
         backgroundColor: 'white', 
@@ -199,6 +197,17 @@ import {
         // textDecorationLine: 'none',
         textAlignVertical: 'center',
         textAlign: 'justify'
+      },
+      contenedorBoton: {
+        width: '10%', 
+        // height: '80%',
+        marginLeft: '5%',
+        alignItems: 'center', 
+        // alignContent: 'center', 
+        marginBottom: '2%', 
+        // backgroundColor: 'red', 
+        justifyContent: "center",
+        paddingVertical: 4
       },
   });
   

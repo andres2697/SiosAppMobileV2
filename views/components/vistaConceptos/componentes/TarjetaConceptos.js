@@ -127,7 +127,7 @@ import {
                   style={[styles.inputCustomizedInfo]}
                   underlineColor="transparent"
                   activeUnderlineColor="#2166E5"
-                  selectionColor="black"
+                  selectionColor="#2166E5"
                   keyboardType="numeric"
                   autoFocus={false}
                   editable={esEditable}

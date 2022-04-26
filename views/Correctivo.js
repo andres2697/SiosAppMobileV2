@@ -30,6 +30,7 @@ import {
   import StepThree from "./components/stepsCorrectivo/StepThree";
   import Herramientas from "./components/Herramientas";
   import MaterialesConcepto from "./components/MaterialesConcepto";
+import BotonesStepTwo from "./components/BotonesStepTwo";
 
   
   const Correctivo = () => {
@@ -48,6 +49,7 @@ import {
     const auth = getAuth();
   
     const [folio, setFolio] = useState('');
+    const [estado, setEstado] = useState(0);
     const [tipoFolio, setTipoFolio] = useState('');
     const [distrito, setDistrito] = useState('');
     const [cluster, setCluster] = useState('');
@@ -57,7 +59,6 @@ import {
     const [fechaInicio, setFechaInicio] = useState('');
     const [horaInicio, setHoraInicio] = useState('');
     const [paso, setPaso] = useState(1);
-    const [estado, setEstado] = useState(false);
     const [altura, setAltura] = useState('100%');
     const [altura2, setAltura2] = useState(0);
     const [altura3, setAltura3] = useState(0);
@@ -72,6 +73,7 @@ import {
     const cargarInfoFolio = useCallback(async()=>{
         const variables = await get(child(ref(database), `foliosAsignados/${auth.currentUser.uid}/correctivo/activo`, limitToFirst(1)))
                 .then((snapshot) => {
+                    // console.log(snapshot);
                     snapshot.forEach(element => {
                         setFolio(element.key);
                         setTipoFolio(element.val()['tipo']);
@@ -80,20 +82,114 @@ import {
                         setFalla(element.val()['falla']);
                         setCausa(element.val()['causa']);
                         setClientesAfectados(element.val()['clientesAfectados']);
-                        setFechaInicio(element.val()['horaInicio']['fecha']);
-                        setHoraInicio(element.val()['horaInicio']['hora']);
+                        // setFechaInicio(element.val()['horaInicio']['fecha']);
+                        // setHoraInicio(element.val()['horaInicio']['hora']);
+                        setEstado(element.val()['estado']);
                         setTituloPagina('Folio correctivo');
+                        // console.log(estado);
+                        if(element.val()['estado'] == 1){
+                            setFechaInicio(element.val()['horaInicio']['fecha']);
+                            setHoraInicio(element.val()['horaInicio']['hora']);
+                        }
+                        else if(element.val()['estado'] == 2){
+                            setFechaInicio(element.val()['horaLlegada']['fecha']);
+                            setHoraInicio(element.val()['horaLlegada']['hora']);
+                            setBurbuja1("#2166E5");
+                            setLinea1("#2166E5");
+                            setBurbuja2("#2166E5");
+                            setLinea2("#EDF2F9");
+                            setBurbuja3("black");
+                            setAltura(0);
+                            setAltura3(0);
+                            Animated.parallel([
+                                Animated.timing(animation, {
+                                    toValue: -50,
+                                    duration: 0,
+                                    // delay: 600,
+                                    useNativeDriver: false
+                                }),
+                                Animated.timing(animationO, {
+                                    toValue: 0,
+                                    duration: 0,
+                                    // delay: 600,
+                                    useNativeDriver: false
+                                }),
+                                Animated.timing(animation2, {
+                                    toValue: 0,
+                                    duration: 0,
+                                    // delay: 600,
+                                    useNativeDriver: false
+                                }),
+                                Animated.timing(animationO2, {
+                                    toValue: 1,
+                                    duration: 0,
+                                    // delay: 600,
+                                    useNativeDriver: false
+                                }),
+                            ]).start();
+                            setAltura2('100%');
+                        }
+                        else if(element.val()['estado'] == 3){
+                            setFechaInicio(element.val()['horaActivacion']['fecha']);
+                            setHoraInicio(element.val()['horaActivacion']['hora']);
+                            setBurbuja1("#2166E5");
+                            setLinea1("#2166E5");
+                            setBurbuja2("#2166E5");
+                            setLinea2("#EDF2F9");
+                            setBurbuja3("black");
+                            setAltura(0);
+                            setAltura2(0);
+                            Animated.parallel([
+                                Animated.timing(animation, {
+                                    toValue: -50,
+                                    duration: 0,
+                                    // delay: 600,
+                                    useNativeDriver: false
+                                }),
+                                Animated.timing(animationO, {
+                                    toValue: 0,
+                                    duration: 0,
+                                    // delay: 600,
+                                    useNativeDriver: false
+                                }),
+                                Animated.timing(animation2, {
+                                    toValue: -50,
+                                    duration: 0,
+                                    // delay: 600,
+                                    useNativeDriver: false
+                                }),
+                                Animated.timing(animationO2, {
+                                    toValue: 0,
+                                    duration: 0,
+                                    // delay: 600,
+                                    useNativeDriver: false
+                                }),
+                                Animated.timing(animation3, {
+                                    toValue: 0,
+                                    duration: 0,
+                                    // delay: 600,
+                                    useNativeDriver: false
+                                }),
+                                Animated.timing(animationO3, {
+                                    toValue: 1,
+                                    duration: 0,
+                                    // delay: 600,
+                                    useNativeDriver: false
+                                }),
+                            ]).start();
+                            setAltura3('100%');
+                        }
                     });
                 }).catch(function (err) {
                     console.log(err);
                 });
-    });
+            });
 
-    useEffect(()=> {
-        cargarInfoFolio();
-    }, []);
+        useEffect(()=> {
+            cargarInfoFolio();
+        }, []);
 
-    startAnimate = (valorNuevo, valorNuevoE, colores) => {
+    startAnimate = (valorNuevo, valorNuevoE, colores, tiempo) => {
         setBurbuja1(colores[0]);
         setLinea1(colores[1]);
         setBurbuja2(colores[2]);
@@ -125,6 +221,8 @@ import {
         ]).start();
         setAltura(0);
         setAltura2('100%');
+        setFechaInicio(tiempo[0] + '/' + tiempo[1] + '/' + tiempo[2]);
+        setHoraInicio(tiempo[3] + ':' + tiempo[4]);
     };
 
     startAnimate2 = (valorNuevo, valorNuevoE, colores) => {
@@ -176,36 +274,7 @@ import {
     if (!iconsLoaded || !fontsLoaded ) {
         // return
             // <View>
-        return <AppLoading 
-                    // startAsync={cargarInfoFolio}
-                    // onFinish={()=>setCargado(true)}
-                    // onError={console.warn}
-                />
-            //     <View style={{ flex: 1, justifyContent: "center", backgroundColor: '#ffffff', width: '100%' }}>
-            //         <ActivityIndicator
-            //         size="large"
-            //         color="#2166E5"
-            //         animating={!cargado}
-                    // />;
-            //     </View>     
-            // </View>
-    
-        // return <AppLoading
-            // startAsync={()=> {
-            //     cargarInfoFolio();
-            // }}
-            // onFinish={() => {
-            //     setCargado(true);
-            // }}
-            // onError={console.warn}
-        // />;
-        // return (
-        //     <ActivityIndicator
-        //     size="large"
-        //     color="#2166E5"
-        //     animating={!desplegar}
-        //   />
-        // );
+        return <AppLoading />
     }
 
 
@@ -266,9 +335,12 @@ import {
                                 fechaInicio={fechaInicio}
                                 horaInicio={horaInicio}
                             ></Tiempos>
-                            <StepOne
-                                callback={startAnimate.bind(this)}
-                            ></StepOne>
+                            <View style={{ height: altura}}>
+                                <StepOne
+                                    callback={startAnimate.bind(this)}
+                                    folio={folio}
+                                ></StepOne>
+                            </View>
                         </Animated.View>
                     </View>
                     {/*Esta vista es de StepTwo, cambiará de lugar con los siguientes pasos.*/}
@@ -293,44 +365,17 @@ import {
                             <StepTwo
                                 // callback={startAnimate.bind(this)}
                             ></StepTwo>
-                            <Herramientas></Herramientas>
+                            <Herramientas
+                                folio = {folio}
+                            ></Herramientas>
                             <MaterialesConcepto
                                 folio = {folio}
                             ></MaterialesConcepto>
-                            <View style={{ width: '50%', marginBottom: 45, alignSelf: "center" }}>
-                                <Button
-                                    mode="contained"
-                                    color="#EDF2F9"
-                                    uppercase={false}
-                                    style={{ borderRadius: 50 }}
-                                    onPress={()=>{
-                                        navigation.navigate('Observaciones', {
-                                            folio: folio
-                                        });
-                                    }}
-                                >
-                                    <Text style={{ fontSize: 17, fontFamily: 'Urbanist_400Regular' }}>
-                                        Observaciones
-                                    </Text>
-                                </Button>
-                            </View>
-
-                            <View style={{ width: '40%', marginBottom: 20, alignSelf: "center" }}>
-                                <Button
-                                    mode="contained"
-                                    color="#2166E5"
-                                    uppercase={false}
-                                    style={{ borderRadius: 50, elevation: 5 }}
-                                    onPress={()=>{
-                                        console.log('hola');
-                                        startAnimate2(-50, 0, ["#2166E5", "#2166E5","#2166E5", "#2166E5", "#2166E5"]);
-                                    }}
-                                >
-                                    <Text style={{ fontSize: 17, fontFamily: 'Urbanist_400Regular' }}>
-                                        Terminé
-                                    </Text>
-                                </Button>
-                            </View>
+                            <BotonesStepTwo
+                                callback={startAnimate2.bind(this)}
+                                folio={folio}
+                            >
+                            </BotonesStepTwo>
                         </Animated.View>
                     </View>
 
