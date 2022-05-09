@@ -12,6 +12,7 @@
   
   const MaterialesTP = (props) => {
     const folio = props.route.params.folio;
+    const lista = props.route.params.lista;
     const [materialSeleccionado, setMaterialSeleccionado] = useState("default");
     const [habilitado, setHabilitado] = useState(true);
     const [cantidad, setCantidad] = useState("1");
@@ -34,7 +35,7 @@
   
     return (
       <View style={styles.contenedorPrincipal}>
-        <ListaMateriales folio={folio} tipoMaterial={2}></ListaMateriales>
+        <ListaMateriales folio={folio} tipoMaterial={2} lista={lista}></ListaMateriales>
       </View>
     );
   };

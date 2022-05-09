@@ -26,10 +26,22 @@ export default function App() {
   const [splashScreen, setSplashScreen] = useState(false);
   const video = React.useRef(null);
   
-LogBox.ignoreLogs(['Remote debugger']);
+  LogBox.ignoreLogs(['Remote debugger']);
   const [fontsLoaded] = useFonts({
     Urbanist_400Regular,
   });
+  SplashScreen.preventAutoHideAsync()
+  .then(result => console.log(''))
+  .catch(console.warn); 
+
+  SplashScreen.hideAsync()
+  .then(result => console.log(''))
+  .catch(console.warn); 
+  setTimeout(async () => {
+    await SplashScreen.hideAsync();
+  }, 2000);
+  clearTimeout();
+    // Prevent native splash screen from autohiding before App component declaration
 
   if (!fontsLoaded) {return <AppLoading />};
 

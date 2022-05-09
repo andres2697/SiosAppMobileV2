@@ -19,8 +19,11 @@ import {
   
   const Conceptos = (props) => {
     const folio = props.route.params.folio;
+    const lista = props.route.params.lista;
     const [materialSeleccionado, setMaterialSeleccionado] = useState("default");
     const [habilitado, setHabilitado] = useState(true);
+
+    // console.log(lista);
 
     const Iconos = createIconSetFromIcoMoon(
       require("../../../icons/selection.json"),
@@ -45,10 +48,10 @@ import {
                   <Text style={{ fontSize: 16, fontWeight: '700' }}>Folio: {folio}</Text>
               </View>
                 <View style={ styles.contenedorCab24 }>
-                    <Cab24 folio={folio} tipoMaterial='2'></Cab24>
+                    <Cab24 folio={folio}></Cab24>
                 </View>
                 <View>
-                    <EntradaConceptos folio={folio} tipoMaterial='2'></EntradaConceptos>
+                    <EntradaConceptos folio={folio} lista={lista}></EntradaConceptos>
                 </View>
             </View>
         </ScrollView>

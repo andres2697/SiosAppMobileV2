@@ -2,7 +2,7 @@
   "expo": {
     "name": "SiosAppMobileV2",
     "slug": "SiosAppMobileV2",
-    "version": "1.0.0",
+    "version": "2.23.2",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "updates": {

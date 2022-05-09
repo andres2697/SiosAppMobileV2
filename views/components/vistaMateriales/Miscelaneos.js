@@ -10,6 +10,7 @@ import ListaMateriales from "./Componentes/ListaMateriales";
 
 const Miscelaneos = (props) => {
   const folio = props.route.params.folio;
+  const lista = props.route.params.lista;
   
   const Iconos = createIconSetFromIcoMoon(
     require("../../../icons/selection.json"),
@@ -29,7 +30,7 @@ const Miscelaneos = (props) => {
 
   return (
     <View style={styles.contenedorPrincipal}>
-        <ListaMateriales folio={folio} tipoMaterial={1}></ListaMateriales>
+        <ListaMateriales folio={folio} tipoMaterial={1} lista={lista}></ListaMateriales>
     </View>
   );
 };

@@ -12,9 +12,20 @@
   import { useFonts, Urbanist_400Regular } from "@expo-google-fonts/urbanist";
   import { useNavigation, NavigationAction } from '@react-navigation/native';
   import { NavigationActions } from 'react-navigation';  
+  import {
+    getDatabase,
+    child,
+    get,
+    ref,
+    limitToFirst,
+    set,
+  } from "firebase/database";
+  
   
   const MaterialesConcepto = (props) => {
     const navigation = useNavigation();
+    const db = getDatabase();
+    
     const folio = props.folio;
 
     const Iconos = createIconSetFromIcoMoon(
@@ -38,9 +49,27 @@
           <View style={styles.contenedorSegmentos}>
             <View style={styles.contenedorGris}>
               <TouchableWithoutFeedback
-                onPress={() => {
+                onPress={async() => {
+                  let lista = new Array();
+                  let i = 0;
+                  await get(
+                    child(
+                      ref(db),
+                      `inventario/materiales/miscelaneos`
+                    )
+                  )
+                    .then((snapshot) => {   
+                      // console.log(snapshot);    
+                      snapshot.forEach(element => {
+                        lista.push({title: element.key, id: i});
+                        i = i + 1;
+                        // console.log(element.key);
+                      });
+                    })
+                    .catch(function (err) {});
+                    // console.log(lista);
                   navigation.navigate('Miscelaneos', {
-                    folio: folio
+                    folio: folio, lista: lista
                   });
                 }}
                 style={{ width: "65%" }}
@@ -60,10 +89,27 @@
           <View style={styles.contenedorSegmentos}>
             <View style={styles.contenedorGris}>
               <TouchableWithoutFeedback
-                onPress={() => {
-                  console.log("tocaste el ícono");
+                onPress={async() => {
+                  // console.log("tocaste el ícono");
+                  let lista = new Array();
+                  let i = 0;
+                  await get(
+                    child(
+                      ref(db),
+                      `inventario/materiales/TP`
+                    )
+                  )
+                    .then((snapshot) => {   
+                      // console.log(snapshot);    
+                      snapshot.forEach(element => {
+                        lista.push({title: element.key, id: i});
+                        i = i + 1;
+                        // console.log(element.key);
+                      });
+                    })
+                    .catch(function (err) {});
                   navigation.navigate('MaterialesTP', {
-                    folio: folio
+                    folio: folio, lista: lista
                   });
                 }}
                 style={{ width: "65%" }}
@@ -93,9 +139,29 @@
           <View style={styles.contenedorSegmentos}>
             <View style={styles.contenedorGris}>
               <TouchableWithoutFeedback
-                onPress={() => {
+                onPress={async() => {
+                  let lista = new Array();
+                  let i = 0;
+                  await get(
+                    child(
+                      ref(db),
+                      `conceptos`
+                    )
+                  )
+                    .then((snapshot) => {   
+                      // console.log(snapshot);    
+                      snapshot.forEach(element => {
+                        if(element.key !== 'CAB-024'){
+                          lista.push({title: element.key, id: i});
+                          i = i + 1;
+                        }
+                        // console.log(element.key);
+                      });
+                    })
+                    .catch(function (err) {});
+                  // console.log(lista);
                   navigation.navigate('Conceptos', {
-                    folio: folio
+                    folio: folio, lista: lista
                   });
                 }}
                 style={{ width: "65%" }}
