@@ -30,7 +30,7 @@ import {
   import StepThree from "./components/stepsCorrectivo/StepThree";
   import Herramientas from "./components/Herramientas";
   import MaterialesConcepto from "./components/MaterialesConcepto";
-import BotonesStepTwo from "./components/BotonesStepTwo";
+  import BotonesStepTwo from "./components/BotonesStepTwo";
 
   
   const Correctivo = () => {

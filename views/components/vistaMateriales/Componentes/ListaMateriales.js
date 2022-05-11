@@ -17,18 +17,28 @@ import {
   import EntradaMateriales from "../Componentes/EntradaMateriales";
   import Toast from 'react-native-root-toast';
   import { getAuth } from "firebase/auth";
+  import {
+    getDatabase,
+    child,
+    get,
+    ref,
+    set,
+  } from "firebase/database";
   
   const ListaMateriales = (props) => {
     const folio = props.folio;
     const tipoMaterial = props.tipoMaterial;
     const [lista, setLista] = useState(props.lista);
     const [cantidad, setCantidad] = useState("1");
-    const [index, setIndex] = useState(1);
     const [habilitado, setHabilitado] = useState(true);
   
     const [cantidadMat, setCantidadMat] = useState('');
     const [valorMat, setValorMat] = useState('default');
-    const [materiales, setMateriales] = useState(new Array());
+    const [materiales, setMateriales] = useState(props.materiales);
+    let index = props.tamanio;
+
+    const db = getDatabase();
+    const auth = getAuth();
 
     showToast = (message, color) =>{
       // ToastAndroid.show(message, ToastAndroid.SHORT, styles.tostada);
@@ -67,67 +77,6 @@ import {
     }
 
     // const auth = getAuth();
-    detectarCambio = (h, valor, cantidad ) => {
-      // console.log('Cantidad: ' + cantidad);
-      // console.log('Material: ' + valor);
-
-      // setHablilitado(false);
-      // setValorMat(valor);
-      // setCantidadMat(cantidad);
-      // console.log('Cantidad: ' + cantidadMat);
-      // console.log('Material: ' + valorMat);
-      // materiales.push({
-      //   key: index,
-      //   titulo: valor,
-      //   cantidad: cantidad
-      // });
-
-      // setIndex(index + 1);
-      
-      //   lista[item.id].estado = false;
-      // let i = true;
-      // let entrar = false;
-      // let temp = new Array();
-
-      // if(listaSeleccionados.length == 0){
-      //   listaSeleccionados.push({
-      //     elementoRender: indice,
-      //     elementoSeleccionado: valor,
-      //   });
-      // }else{
-      //   listaSeleccionados.forEach((item)=>{
-      //     entrar = false;
-      //     if(item.elementoRender == indice){
-      //       // item.elementoSeleccionado = valor;
-      //       // listaSeleccionados[item.elementoRender].elementoSeleccionado = valor;
-      //       console.log('valor especifico: ' + item.elementoRender);
-      //       listaSeleccionados[item.elementoRender].elementoSeleccionado = valor;
-      //       i = false;
-      //       entrar = true;
-      //       console.log('nuevo valor: ');
-      //       console.log(item.elementoSeleccionado);
-      //     }
-      //     if(!entrar){
-      //       temp.push({
-      //         elementoRender: indice,
-      //         elementoSeleccionado: valor,
-      //       });
-      //     }
-      //   });
-      //   if(i){
-      //     listaSeleccionados.push({
-      //       elementoRender: indice,
-      //       elementoSeleccionado: valor,
-      //     });
-      //   }else{
-      //     // listaSeleccionados.filter((item, index) => {item.elementoS !== valueToRemove});
-      //   }
-      // }
-
-      // console.log(lista);
-
-      setHabilitado(h);
-    }
     const Iconos = createIconSetFromIcoMoon(
       require("../../../../icons/selection.json"),
       "IcoMoon",
@@ -143,7 +92,8 @@ import {
     if (!iconsLoaded || !fontsLoaded) {
       return <AppLoading />;
     }
-  
+    // console.log('Materiales');
+    // console.log(materiales);
     return (
         <View style={styles.contenedorMiscelaneos} >
           <FlatList
@@ -161,9 +111,6 @@ import {
                 <Text style={{ fontSize: 16, fontWeight: '700' }}>Folio: {folio}</Text>
               </View>
             )}
-            // ListFooterComponent={() => (
-              
-            // )}
             keyExtractor={(item) => item.key}
             renderItem={({ item, index }) => (
               <View style={[styles.contenedorListaMiscelaneos, { marginBottom: 5 }]}>
@@ -185,37 +132,36 @@ import {
                   valorMat={valorMat}
                   cantidadMat={cantidadMat}
                   setCantidadMat={setCantidadMat}
-                  setValorMat= {setValorMat}
+                  setValorMat={setValorMat}
+                  seleccionado={habilitado}
+                  setSeleccionado={setHabilitado}
                 ></EntradaMateriales>
                 <Pressable
-                  // disabled={habilitado}
+                  disabled={habilitado}
                   onTouchStart={()=>{
-                    // if(habilitado){
-                    //   setTimeout(() => {
-                    //     // setDespliegue(true);
-                    //     showToast('Favor de seleccionar un material antes de agregar otro.', 'red');
-                    //   }, 200);  
-                    //   clearTimeout();
-                    // }
-                    // console.log('hola');
+                    if(habilitado){
+                      setTimeout(() => {
+                        // setDespliegue(true);
+                        showToast('Favor de seleccionar un material.', '#F01028');
+                      }, 200);  
+                      clearTimeout();
+                    }
                   }}
                   onPress={() => {
-                    // console.log(lista.length);
-                    // props.saludar();
-                    
-                    // console.log('Cantidad' + cantidadMat);
-                    // console.log(valorMat);
                     let temp = new Array();
                     let x = 0;
+                    // let index = props.tamanio;
                     if(index <= (lista.length + materiales.length) ){
+                      // console.log(index);
+                      // setIndex(index + 1); 
+                      setHabilitado(true);
                       materiales.push({
                         key: index,
                         titulo: valorMat,
                         cantidad: cantidadMat
-                      });
-                      setIndex(index + 1); 
-                      console.log(index);   
-
+                      }); 
+                      index = index + 1;
+                      console.log(materiales);
                       lista.forEach((item)=>{
                         if(item.title !== valorMat){
                           // console.log(valorMat);
@@ -223,6 +169,24 @@ import {
                           x = x + 1;
                         }
                       });
+
+                      if(tipoMaterial === 1){
+                            set(
+                                child(
+                                ref(db),
+                                `foliosAsignados/${auth.currentUser.uid}/correctivo/activo/${folio}/materialesUsados/miscelaneos/${valorMat}`
+                                ),
+                                Number(cantidadMat)
+                            );
+                        }else if(tipoMaterial === 2){
+                            set(
+                                child(
+                                ref(db),
+                                `foliosAsignados/${auth.currentUser.uid}/correctivo/activo/${folio}/materialesUsados/TP/${valorMat}`
+                                ),
+                                Number(cantidadMat)
+                            );
+                        }
                       // console.log(temp);
                       setLista(temp);
                       setCantidadMat('');

@@ -17,38 +17,30 @@ import {
   import { async } from "@firebase/util";
   
   const EntradaConceptos = (props) => {
-    const folio = props.folio;
-  
-    const [coordenadas, setCoordenadas] = useState([]);
-    const [coordenadasData, setCoordenadasData] = useState([]);
-  
-    const [conceptoSeleccionado, setConceptoSeleccionado] = useState("default");
+    // const folio = props.folio;
+    const conceptos = props.conceptos;
+    const conceptoSeleccionado = props.conceptoSeleccionado;
+    const setConceptoSeleccionado = props.setConceptoSeleccionado;
+    const cantidad = props.cantidad;
+    const setCantidad = props.setCantidad;
+    const esEditable = props.esEditable;
+    const setEsEditable = props.setEsEditable;
+    const seleccionado = props.habilitado;
+    const setSeleccionado = props.setSeleccionado;
+
     const [habilitado, setHabilitado] = useState(true);
-    const [esEditable, setEsEditable] = useState(false);
-    const [cantidad, setCantidad] = useState("");
   
-    const [cantidadC, setCantidadC] = useState(0);
-    const [title, setTitulo] = useState(new Array());
-  
-    agregarItemConceptos = () => {
-      title.push({
-        keyConceptos: cantidadC,
-        titulo: "Titulo",
-      });
-      let send = cantidadC + 1;
-      setCantidadC(send);
-    };
-  
-    llenarArreglo = async (datos) => {
-      // console.log('Cantidad Total: ' + cantidad);  
-      for (var i = 0; i < parseInt(cantidad); i++) {
-        setCoordenadasData(coordenadasData.push("19.299268,-99.2231495"));
-      }  
-      setCoordenadas([
-        ...coordenadas,
-        { title: "coordenadas", data: coordenadasData },
-      ]);
-    };
+    // console.log(conceptos);
+    // llenarArreglo = async (datos) => {
+    //   // console.log('Cantidad Total: ' + cantidad);  
+    //   for (var i = 0; i < parseInt(cantidad); i++) {
+    //     setCoordenadasData(coordenadasData.push("19.299268,-99.2231495"));
+    //   }  
+    //   setCoordenadas([
+    //     ...coordenadas,
+    //     { titulo: "coordenadas", data: coordenadasData },
+    //   ]);
+    // };
   
     const Iconos = createIconSetFromIcoMoon(
       require("../../../../icons/selection.json"),
@@ -82,20 +74,16 @@ import {
                   onBlur={() => {
                     setHabilitado(true);
                   }}
-                  onValueChange={async (itemValue, itemIndex) => {
+                  onValueChange={(itemValue, itemIndex) => {
                     setHabilitado(true);
                     setConceptoSeleccionado(itemValue);
-                    if (itemValue == "default") {
-                      setCantidad("");
-                    } else {
-                      setEsEditable(true);
-                      if (cantidad == "") {
-                        setCantidad("1");
-                        // setCoordenadasData();
-                        // setCoordenadas([...coordenadas, { title: "coordenadas", data: [...coordenadasData, '19.299268,-99.2231495'] }]);
-                        // console.log(coordenadas);
-                      }
+                    setSeleccionado(false);
+                    setEsEditable(false);
+                    if (cantidad == "") {
+                      setCantidad("1");
                     }
+                    // setHabilitarBoton(false);
+                    console.log('se cambió el select');
                   }}
                 >
                   <Picker.Item
@@ -104,65 +92,31 @@ import {
                     value="default"
                     enabled={habilitado}
                   />
-                  <Picker.Item
-                    style={styles.itemSelector}
-                    label="AER-008"
-                    value="AER-008"
-                  />
-                  <Picker.Item
-                    style={styles.itemSelector}
-                    label="LASH-004"
-                    value="LASH-004"
-                  />
-                  <Picker.Item
-                    style={styles.itemSelector}
-                    label="MTFO-018"
-                    value="MTFO-018"
-                  />
+                  {conceptos.map((item) => (<Picker.Item  style={[styles.itemSelector]} 
+                                                        label={item.title} 
+                                                        value={item.title} 
+                                                        key={item.id} 
+                                        />))}
                 </Picker>
               </View>
               <View style={{ width: "25%", alignSelf: "center", height: 55 }}>
                 <HelperText style={styles.helper}>Cantidad</HelperText>
                 <TextInput
+                  value={cantidad}
                   style={[styles.inputCustomizedInfo]}
                   underlineColor="transparent"
                   activeUnderlineColor="#2166E5"
                   selectionColor="#2166E5"
                   keyboardType="numeric"
                   autoFocus={false}
-                  editable={esEditable}
-                  onEndEditing={async () => {
-                    // console.log('Cantidad por verificar');
-                    // if(conceptoSeleccionado == 'CAB-024' && cantidad != ''){
-                    //     console.log('Cantidad aceptada');
-                    //     if(parseInt(cantidad) > 0){
-                    //         console.log('Cantidad mayor');
-                    //         setCoordenadas(new Array);
-                    //         setCoordenadasData(new Array);
-                    //         console.log(coordenadasData);
-                    //         await llenarArreglo('listo');
-                    //         console.log('listo')
-                    //     }
-                    // }
-                  }}
+                  disabled={esEditable}
                   onChangeText={(cantidad) => setCantidad(cantidad)}
                   onBlur={() => {
-                    if (cantidad == "") {
-                      setCantidad("1");
+                    if (cantidad == '') {
+                      setCantidad('1');
                     }
                   }}
-                  value={cantidad}
                 ></TextInput>
-              </View>
-              <View style={{ width: "15%", alignSelf: "center", height: 55 }}>
-                <Iconos
-                  name="borrar"
-                  style={styles.eliminar}
-                  size={45}
-                  onPress={() => {
-                    console.log("Eliminando...");
-                  }}
-                ></Iconos>
               </View>
             </View>
           </View>

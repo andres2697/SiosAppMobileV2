@@ -32,9 +32,12 @@ import {
     const setCantidadMat = props.setCantidadMat;
     const materialSeleccionado = props.valorMat;
     const setMaterialSeleccionado = props.setValorMat;
+    const seleccionado = props.habilitado;
+    const setSeleccionado = props.setSeleccionado;
     // console.log(llave);
     // const [materialSeleccionado, setMaterialSeleccionado] = useState('default');
     const [habilitado, setHabilitado] = useState(true);
+    const [habilitadoInput, setHabilitadoInput] = useState(true);
     const [deshabilitar, setDeshabilitar] = useState(true);
     // const [cantidad, setCantidad] = useState('');
     const [i, setI] = useState(0);
@@ -80,84 +83,15 @@ import {
                         setHabilitado(true);
                     }}
                     onValueChange={(itemValue, itemIndex) => {
+                        setHabilitadoInput(false);
                         setHabilitado(true);
-                        // console.log(itemValue);
                         setMaterialSeleccionado(itemValue);
-                        // if(tipoMaterial === 1){
-                        //     set(
-                        //         child(
-                        //         ref(db),
-                        //         `foliosAsignados/${auth.currentUser.uid}/correctivo/activo/${folio}/materialesUsados/miscelaneos/${materialSeleccionado}`
-                        //         ),
-                        //         null
-                        //     );
-                        // }else if(tipoMaterial === 2){
-                        //     set(
-                        //         child(
-                        //         ref(db),
-                        //         `foliosAsignados/${auth.currentUser.uid}/correctivo/activo/${folio}/materialesUsados/TP/${materialSeleccionado}`
-                        //         ),
-                        //         null
-                        //     );
-                        // }
-                        // console.log(itemValue);
+                        setSeleccionado(false);
                         if(addDefaultValue || cantidad == ''){
                             setCantidadMat('1');
                             setAddDefaultValue(false);
                             console.log(cantidad);
-
-                            // props.callback(
-                            //     false,
-                            //     itemValue,
-                            //     1
-                            // );
-                            // if(tipoMaterial === 1){
-                            //     set(
-                            //         child(
-                            //           ref(db),
-                            //           `foliosAsignados/${auth.currentUser.uid}/correctivo/activo/${folio}/materialesUsados/miscelaneos/${itemValue}`
-                            //         ),
-                            //         1
-                            //     );
-                            // }else if(tipoMaterial === 2){
-                            //     set(
-                            //         child(
-                            //           ref(db),
-                            //           `foliosAsignados/${auth.currentUser.uid}/correctivo/activo/${folio}/materialesUsados/TP/${itemValue}`
-                            //         ),
-                            //         1
-                            //     );
-                            // }
-                        }else{
-                            // props.callback(
-                            //     false,
-                            //     itemValue,
-                            //     cantidad
-                            // );
                         }
-                        // }else{
-                        //     if(tipoMaterial === 1){
-                        //         set(
-                        //             child(
-                        //               ref(db),
-                        //               `foliosAsignados/${auth.currentUser.uid}/correctivo/activo/${folio}/materialesUsados/miscelaneos/${itemValue}`
-                        //             ),
-                        //             Number(cantidad)
-                        //         );
-                        //     }else if(tipoMaterial === 2){
-                        //         set(
-                        //             child(
-                        //               ref(db),
-                        //               `foliosAsignados/${auth.currentUser.uid}/correctivo/activo/${folio}/materialesUsados/TP/${itemValue}`
-                        //             ),
-                        //             Number(cantidad)
-                        //         );
-                        //     }
-                        // }
-                        // props.lista = new Array();
-                        // console.log(llave);
-                        // console.log(materialSeleccionado);
-                        
                     }}
                 >
                     <Picker.Item style={styles.itemSelector} label="Selecciona una opción" value="default" enabled={habilitado} />
@@ -172,6 +106,7 @@ import {
                 <HelperText style={styles.helper}>Cantidad</HelperText>
                 <TextInput
                     value={cantidad}
+                    disabled={habilitadoInput}
                     style={[styles.inputCustomizedInfo]}
                     underlineColor="transparent"
                     activeUnderlineColor="#2166E5"
@@ -183,23 +118,6 @@ import {
                         if(cantidad == ''){
                             setCantidadMat('1');
                         }
-                        // if(tipoMaterial === 1){
-                        //     set(
-                        //         child(
-                        //         ref(db),
-                        //         `foliosAsignados/${auth.currentUser.uid}/correctivo/activo/${folio}/materialesUsados/miscelaneos/${materialSeleccionado}`
-                        //         ),
-                        //         Number(cantidad)
-                        //     );
-                        // }else if(tipoMaterial === 2){
-                        //     set(
-                        //         child(
-                        //         ref(db),
-                        //         `foliosAsignados/${auth.currentUser.uid}/correctivo/activo/${folio}/materialesUsados/TP/${materialSeleccionado}`
-                        //         ),
-                        //         Number(cantidad)
-                        //     );  
-                        // }
                     }}
                 ></TextInput>
             </View>

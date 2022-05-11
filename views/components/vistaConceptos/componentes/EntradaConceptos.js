@@ -6,7 +6,7 @@ import {
   SectionList,
   FlatList,
   Pressable,
-  ActivityIndicator
+  ActivityIndicator,
   // TextInput,
 } from "react-native";
 import { useState, useRef } from "react";
@@ -18,24 +18,71 @@ import { useFonts, Urbanist_400Regular } from "@expo-google-fonts/urbanist";
 import { Picker } from "@react-native-picker/picker";
 import { async } from "@firebase/util";
 import TarjetaConceptos from "./TarjetaConceptos";
+import Toast from 'react-native-root-toast';
+import { getAuth } from "firebase/auth";
+import {
+  getDatabase,
+  child,
+  get,
+  ref,
+  set,
+} from "firebase/database";
 
 const EntradaConceptos = (props) => {
   const folio = props.folio;
+  const [conceptos, setConceptos] = useState(props.lista);
+  const [listaConceptos, setListaConceptos] = useState(props.conceptos);
+  let index = props.tamanio;
 
-  const [coordenadas, setCoordenadas] = useState([]);
-  const [coordenadasData, setCoordenadasData] = useState([]);
-
+  const db = getDatabase();
+  const auth = getAuth();
+  // const [coordenadas, setCoordenadas] = useState([]);
+  // const [coordenadasData, setCoordenadasData] = useState([]);
   const [conceptoSeleccionado, setConceptoSeleccionado] = useState("default");
+  const [esEditable, setEsEditable] = useState(true);
   const [habilitado, setHabilitado] = useState(true);
-  const [esEditable, setEsEditable] = useState(false);
+  // const [habilitarBoton, setHabilitarBoton] = useState(true);
   const [cantidad, setCantidad] = useState("");
-
   const [cantidadC, setCantidadC] = useState(0);
-  const [title, setTitulo] = useState(new Array());
 
-//   agregarItemConceptos = () => {
+  // console.log(conceptos);
 
-//   };
+  showToast = (message, color) =>{
+    // ToastAndroid.show(message, ToastAndroid.SHORT, styles.tostada);
+    let toast = Toast.show(message, {
+        duration: Toast.durations.SHORT,
+        position: -30,
+        // marginBottom: 15,
+        shadow: false,
+        animation: true,
+        hideOnPress: true,
+        delay: 0,
+        backgroundColor: color,
+        borderRadius: 30,
+        fontSize: 14,
+        textColor: 'white',
+        fontWeight: 'bold',
+        onShow: () => {
+            // calls on toast\`s appear animation start
+        },
+        onShown: () => {
+            // calls on toast\`s appear animation end.
+        },
+        onHide: () => {
+            // calls on toast\`s hide animation start.
+        },
+        onHidden: () => {
+            // setErrorColor('transparent');
+        }
+    });
+    
+    // You can manually hide the Toast, or it will automatically disappear after a `duration` ms timeout.
+    setTimeout(function () {
+        Toast.hide(toast);
+    }, 2200);
+    clearTimeout();
+  }
+
 
   const Iconos = createIconSetFromIcoMoon(
     require("../../../../icons/selection.json"),
@@ -56,44 +103,127 @@ const EntradaConceptos = (props) => {
   return (
     <View>
       <FlatList
-        ListEmptyComponent={()=>( <Text style={{ alignSelf: "center" }}> Presione el botón para agregar un concepto </Text> )}
-        data={title}
-        listKey='ConceptList'
+        ListEmptyComponent={() => (
+          <Text style={{ alignSelf: "center" }}>
+            {" "}
+            Presione el botón para agregar un concepto{" "}
+          </Text>
+        )}
+        data={listaConceptos}
+        listKey="ConceptList"
         keyExtractor={(item) => item.keyConceptos}
+        ListHeaderComponent={() => (
+          <View
+            style={{
+              paddingTop: 10,
+              paddingBottom: 20,
+              width: "85%",
+              alignSelf: "center",
+            }}
+          >
+          </View>
+        )}
         renderItem={({ item }) => (
-          <TarjetaConceptos
-            key={item.keyConceptos}
-            title={item.titulo}
-          ></TarjetaConceptos>
+          <View style={[styles.contenedorConceptos, { marginBottom: 5 }]}>
+            <Text> {item.titulo} </Text>
+            <Text> {item.cantidad} </Text>
+            <View style={{ width: "15%", alignSelf: "center", height: 55 }}>
+              <Iconos
+                name="borrar"
+                style={styles.eliminar}
+                size={45}
+                onPress={() => {
+                  console.log("Eliminando...");
+                }}
+              ></Iconos>
+            </View>
+          </View>
           // </View>
         )}
-        ListFooterComponent={() => (
-            <View style={{ width: '100%' }}>
-                <Pressable
-                    onPress={() => {
-                        title.push({
-                            keyConceptos: cantidadC,
-                            titulo: "Titulo",
-                          });
-                        let send = cantidadC + 1;
-                        setCantidadC(send);
-                    }}
-                    style={{ width: "100%" }}
-                >
-                    <View style={styles.botonAgregar}>
-                    <Text style={{ fontSize: 16, fontWeight: "bold" }}>
-                        Agregar concepto
-                    </Text>
-                    <Iconos
-                        name="agregar"
-                        size={35}
-                        style={{ fontWeight: "bold" }}
-                    ></Iconos>
-                    </View>
-                </Pressable>
-            </View>
-        )}
       ></FlatList>
+      <View style={{ width: "100%" }}>
+        <TarjetaConceptos
+          conceptos={conceptos}
+          conceptoSeleccionado={conceptoSeleccionado}
+          setConceptoSeleccionado={setConceptoSeleccionado}
+          setCantidad={setCantidad}
+          cantidad={cantidad}
+          esEditable={esEditable}
+          setEsEditable={setEsEditable}
+          seleccionado={habilitado}
+          setSeleccionado={setHabilitado}
+        ></TarjetaConceptos>
+        <Pressable
+          disabled={habilitado}
+          onTouchStart={()=>{
+            if(habilitado){
+                setTimeout(() => {
+                  // setDespliegue(true);
+                  showToast('Favor de seleccionar un material.', '#F01028');
+                }, 200);  
+                clearTimeout();
+            }
+          }}
+          onPress={() => {
+            let temp = new Array();
+            let x = 0;
+            // let index = props.tamanio;
+            // console.log(index - listaConceptos.length);
+            // console.log(listaConceptos.length + conceptos.length);
+
+            if( (conceptos.length + listaConceptos.length) < index ){
+              setTimeout(() => {
+                // setDespliegue(true);
+                showToast('Se utilizaron todos los materiales disponibles.', '#E5BE01');
+              }, 200);  
+              clearTimeout();
+            }else{
+              setHabilitado(true);
+              listaConceptos.push({
+                keyConceptos: listaConceptos.length + 1,
+                titulo: conceptoSeleccionado,
+                cantidad: cantidad
+              }); 
+              // index = index + 1;
+  
+              // console.log(listaConceptos);
+              conceptos.forEach((item)=>{
+                if(item.title !== conceptoSeleccionado){
+                  // console.log(valorMat);
+                  temp.push({id: x, title: item.title });
+                  x = x + 1;
+                }
+              });
+  
+              set(
+                child(
+                  ref(db),
+                    `foliosAsignados/${auth.currentUser.uid}/correctivo/activo/${folio}/conceptosUsados/${conceptoSeleccionado}`
+                ),
+                Number(cantidad)
+              );
+                      // console.log(temp);
+              setConceptos(temp);
+              setCantidad('');
+              let send = cantidadC + 1;
+              setCantidadC(send);
+
+            }              // setHabilitado(true);
+          }}
+          style={{ width: "100%" }}
+        >
+          <View style={styles.botonAgregar}>
+            <Text style={{ fontSize: 16, fontWeight: "bold" }}>
+              Agregar concepto
+            </Text>
+            <Iconos
+              name="agregar"
+              size={35}
+              style={{ fontWeight: "bold" }}
+            ></Iconos>
+          </View>
+        </Pressable>
+      </View>
     </View>
   );
 };
@@ -120,11 +250,11 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     zIndex: 999,
   },
-  contenedorMaterialesTP: {
+  contenedorConceptos: {
     width: "85%",
     flexDirection: "column",
     alignSelf: "center",
-    marginTop: 25,
+    // marginTop: 5,
     marginBottom: 35,
   },
   inputCustomizedInfo: {

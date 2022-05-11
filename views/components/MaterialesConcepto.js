@@ -20,10 +20,12 @@
     limitToFirst,
     set,
   } from "firebase/database";
+  import { getAuth } from "firebase/auth";
   
   
   const MaterialesConcepto = (props) => {
     const navigation = useNavigation();
+    const auth = getAuth();
     const db = getDatabase();
     
     const folio = props.folio;
@@ -52,6 +54,28 @@
                 onPress={async() => {
                   let lista = new Array();
                   let i = 0;
+                  let arreglo2 = new Array();
+
+                  let consulta1 = await get(
+                    child(
+                      ref(db),
+                      `foliosAsignados/${auth.currentUser.uid}/correctivo/activo/${folio}/materialesUsados/miscelaneos`
+                    )
+                  )
+                    .then((snapshot) => {   
+                      // console.log(snapshot);    
+                      let x = 0;
+                      snapshot.forEach(element => {
+                        // lista.push({title: element.key, id: i});
+                        // i = i + 1;
+                        arreglo2[x] = element.key;
+                        x = x + 1;
+                      });
+                    })
+                    .catch(function (err) {});
+
+                    // console.log(arreglo2);
+
                   await get(
                     child(
                       ref(db),
@@ -68,9 +92,23 @@
                     })
                     .catch(function (err) {});
                     // console.log(lista);
+
+                  
+                  arreglo2.forEach((valor) => {
+                    lista = lista.filter((element)=>{
+                      // console.log(valor);
+                      if(element.title != valor){
+                        return valor;
+                      };
+                    });
+                  });
+
+                  console.log(lista);
+
                   navigation.navigate('Miscelaneos', {
                     folio: folio, lista: lista
                   });
+
                 }}
                 style={{ width: "65%" }}
               >

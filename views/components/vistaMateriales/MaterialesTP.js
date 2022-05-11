@@ -3,19 +3,51 @@
     View,
   } from "react-native";
   import { useFonts as Fuentes } from "expo-font";
-  import { useState, useRef } from "react";
+  import { useState, useRef, useCallback, useEffect } from "react";
   import { createIconSetFromIcoMoon } from "@expo/vector-icons";
   import AppLoading from "expo-app-loading";
   import { useFonts, Urbanist_400Regular } from "@expo-google-fonts/urbanist";
   import ListaMateriales from "./Componentes/ListaMateriales";
-
+  import { getAuth } from "firebase/auth";
+  import {
+    getDatabase,
+    child,
+    get,
+    ref,
+    set,
+  } from "firebase/database";
   
   const MaterialesTP = (props) => {
     const folio = props.route.params.folio;
     const lista = props.route.params.lista;
-    const [materialSeleccionado, setMaterialSeleccionado] = useState("default");
-    const [habilitado, setHabilitado] = useState(true);
-    const [cantidad, setCantidad] = useState("1");
+    const [materiales, setMateriales] = useState(new Array());
+    const [index, setIndex] = useState(0);
+    const db = getDatabase();
+    const auth = getAuth();
+
+  const cargarMateriales = useCallback(async()=>{
+        let x = 0;
+        const variables = await get(child(ref(db), `foliosAsignados/${auth.currentUser.uid}/correctivo/activo/${folio}/materialesUsados/TP`))
+        .then((snapshot) => {
+          snapshot.forEach((element) => {
+              materiales.push({
+                key: x,
+                titulo: element.key,
+                cantidad: element.val().toString()
+              });
+            x = x + 1;
+          });
+          setIndex(x);
+          // console.log('x: ' + x.toString());
+          // console.log(index);
+        }).catch(function (err) {
+          console.log(err);
+        });
+    });
+
+    useEffect(()=> {
+      cargarMateriales();
+    }, []);
 
     const Iconos = createIconSetFromIcoMoon(
       require("../../../icons/selection.json"),
@@ -35,7 +67,7 @@
   
     return (
       <View style={styles.contenedorPrincipal}>
-        <ListaMateriales folio={folio} tipoMaterial={2} lista={lista}></ListaMateriales>
+        <ListaMateriales folio={folio} tipoMaterial={2} lista={lista} materiales={materiales} tamanio={index}></ListaMateriales>
       </View>
     );
   };
