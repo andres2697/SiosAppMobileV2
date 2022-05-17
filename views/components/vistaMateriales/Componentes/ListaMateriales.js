@@ -31,14 +31,43 @@ import {
     const [lista, setLista] = useState(props.lista);
     const [cantidad, setCantidad] = useState("1");
     const [habilitado, setHabilitado] = useState(true);
-  
+    
     const [cantidadMat, setCantidadMat] = useState('');
     const [valorMat, setValorMat] = useState('default');
     const [materiales, setMateriales] = useState(props.materiales);
     let index = props.tamanio;
-
+    const [excepcion, setExcepcion] = useState(0);
+    
     const db = getDatabase();
     const auth = getAuth();
+
+    deleteItemById = (id, titulo, cantidad) => {
+      console.log(id);
+
+      const filteredData = materiales.filter(item => item.key !== id);
+      setMateriales(filteredData);
+      lista.push({title: titulo, id: id});
+
+      if(tipoMaterial === 1){
+        set(
+          child(
+          ref(db),
+          `foliosAsignados/${auth.currentUser.uid}/correctivo/activo/${folio}/materialesUsados/miscelaneos/${titulo}`
+          ),
+          null
+        );
+      }else if(tipoMaterial === 2){
+        setValorMat('default'); 
+        setHabilitado(true);
+        set(
+          child(
+          ref(db),
+          `foliosAsignados/${auth.currentUser.uid}/correctivo/activo/${folio}/materialesUsados/TP/${titulo}`
+          ),
+          null
+        );
+      }
+    }
 
     showToast = (message, color) =>{
       // ToastAndroid.show(message, ToastAndroid.SHORT, styles.tostada);
@@ -117,11 +146,15 @@ import {
                 <Text> {item.titulo} </Text>
                 <Text> {item.cantidad} </Text>
                 <View style={{ width: '15%', alignSelf:"center", height: 55 }}>
-                  <Iconos name="borrar" style={styles.eliminar} size={45} onPress={()=>{console.log('Eliminando...')}}></Iconos>
+                  <Iconos 
+                    name="borrar" style={styles.eliminar} size={45} 
+                    onPress={()=>{
+                      deleteItemById(item.key, item.titulo, item.cantidad);
+                    }
+                  }></Iconos>
                 </View>
               </View>
             )}
-            // extraData={lista}
           ></FlatList>
           <View style={{ width: '100%', justifyContent: "center", alignItems: "center", paddingBottom: 30 }}>
                 <EntradaMateriales 
@@ -141,36 +174,31 @@ import {
                   onTouchStart={()=>{
                     if(habilitado){
                       setTimeout(() => {
-                        // setDespliegue(true);
                         showToast('Favor de seleccionar un material.', '#F01028');
                       }, 200);  
                       clearTimeout();
                     }
                   }}
                   onPress={() => {
-                    let temp = new Array();
-                    let x = 0;
-                    // let index = props.tamanio;
-                    if(index <= (lista.length + materiales.length) ){
-                      // console.log(index);
-                      // setIndex(index + 1); 
-                      setHabilitado(true);
-                      materiales.push({
-                        key: index,
-                        titulo: valorMat,
-                        cantidad: cantidadMat
-                      }); 
-                      index = index + 1;
-                      console.log(materiales);
-                      lista.forEach((item)=>{
-                        if(item.title !== valorMat){
-                          // console.log(valorMat);
-                          temp.push({title: item.title, id: x});
-                          x = x + 1;
-                        }
-                      });
-
-                      if(tipoMaterial === 1){
+                    
+                    if(tipoMaterial === 1){
+                        let temp = new Array();
+                        let x = 0;
+                        if(index <= (lista.length + materiales.length) ){
+                          setHabilitado(true);
+                          materiales.push({
+                            key: index + excepcion,
+                            titulo: valorMat,
+                            cantidad: cantidadMat
+                          }); 
+                          setExcepcion(excepcion + 1);
+                          console.log(excepcion);
+                          lista.forEach((item)=>{
+                            if(item.title !== valorMat){
+                              temp.push({title: item.title, id: x});
+                              x = x + 1;
+                            }
+                          });
                             set(
                                 child(
                                 ref(db),
@@ -178,27 +206,47 @@ import {
                                 ),
                                 Number(cantidadMat)
                             );
-                        }else if(tipoMaterial === 2){
-                            set(
-                                child(
-                                ref(db),
-                                `foliosAsignados/${auth.currentUser.uid}/correctivo/activo/${folio}/materialesUsados/TP/${valorMat}`
-                                ),
-                                Number(cantidadMat)
-                            );
                         }
-                      // console.log(temp);
-                      setLista(temp);
-                      setCantidadMat('');
-                      // console.log(lista);
-                    }else{
-                      setTimeout(() => {
-                        // setDespliegue(true);
-                        showToast('Se utilizaron todos los materiales disponibles.', '#E5BE01');
-                      }, 200);  
-                      clearTimeout();
-                    }
-                    // console.log(miscelaneo);
+                        setLista(temp);
+                        setCantidadMat('');
+                        setValorMat('default');
+                    }else if(tipoMaterial === 2){
+                          let temp = new Array();
+                          let x = 0;
+                          if(index <= (lista.length + materiales.length) ){
+                            setHabilitado(true);
+                            materiales.push({
+                              key: index + excepcion,
+                              titulo: valorMat,
+                              cantidad: cantidadMat
+                            }); 
+                            setExcepcion(excepcion + 1);
+                            console.log(excepcion);
+
+                            lista.forEach((item)=>{
+                              if(item.title !== valorMat){
+                                temp.push({title: item.title, id: x});
+                                x = x + 1;
+                              }
+                            });
+
+                              set(
+                                  child(
+                                  ref(db),
+                                  `foliosAsignados/${auth.currentUser.uid}/correctivo/activo/${folio}/materialesUsados/TP/${valorMat}`
+                                  ),
+                                  Number(cantidadMat)
+                              );
+                          }else{
+                            setTimeout(() => {
+                              showToast('Se utilizaron todos los materiales disponibles.', '#E5BE01');
+                            }, 200);  
+                            clearTimeout();
+                          }
+                          setLista(temp);
+                          setCantidadMat('');
+                          setValorMat('default');
+                        }
                   }}
                   style={{ width: "80%" }}
                 >

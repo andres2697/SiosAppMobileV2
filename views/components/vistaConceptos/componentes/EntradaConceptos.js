@@ -2,12 +2,9 @@ import {
   StyleSheet,
   View,
   Text,
-  TouchableWithoutFeedback,
-  SectionList,
   FlatList,
   Pressable,
   ActivityIndicator,
-  // TextInput,
 } from "react-native";
 import { useState, useRef } from "react";
 import { HelperText, TextInput, Button } from "react-native-paper";
@@ -31,21 +28,18 @@ import {
 const EntradaConceptos = (props) => {
   const folio = props.folio;
   const [conceptos, setConceptos] = useState(props.lista);
-  const [listaConceptos, setListaConceptos] = useState(props.conceptos);
+  const [listaConceptos, setLista] = useState(props.conceptos);
   let index = props.tamanio;
+  const [excepcion, setExcepcion] = useState(1);
 
   const db = getDatabase();
   const auth = getAuth();
-  // const [coordenadas, setCoordenadas] = useState([]);
-  // const [coordenadasData, setCoordenadasData] = useState([]);
+  
   const [conceptoSeleccionado, setConceptoSeleccionado] = useState("default");
   const [esEditable, setEsEditable] = useState(true);
   const [habilitado, setHabilitado] = useState(true);
-  // const [habilitarBoton, setHabilitarBoton] = useState(true);
   const [cantidad, setCantidad] = useState("");
   const [cantidadC, setCantidadC] = useState(0);
-
-  // console.log(conceptos);
 
   showToast = (message, color) =>{
     // ToastAndroid.show(message, ToastAndroid.SHORT, styles.tostada);
@@ -133,7 +127,19 @@ const EntradaConceptos = (props) => {
                 style={styles.eliminar}
                 size={45}
                 onPress={() => {
-                  console.log("Eliminando...");
+                  let filteredData = listaConceptos.filter(list => list.keyConceptos !== item.keyConceptos);
+                  conceptos.push({title: item.titulo, id: item.keyConceptos});
+                    set(
+                      child(
+                      ref(db),
+                      `foliosAsignados/${auth.currentUser.uid}/correctivo/activo/${folio}/conceptosUsados/${item.titulo}`
+                      ),
+                      null
+                    );
+
+                  setConceptoSeleccionado('default');
+                  listaConceptos.splice(0, listaConceptos.length);
+                  setLista(filteredData);
                 }}
               ></Iconos>
             </View>
@@ -158,7 +164,6 @@ const EntradaConceptos = (props) => {
           onTouchStart={()=>{
             if(habilitado){
                 setTimeout(() => {
-                  // setDespliegue(true);
                   showToast('Favor de seleccionar un material.', '#F01028');
                 }, 200);  
                 clearTimeout();
@@ -167,29 +172,22 @@ const EntradaConceptos = (props) => {
           onPress={() => {
             let temp = new Array();
             let x = 0;
-            // let index = props.tamanio;
-            // console.log(index - listaConceptos.length);
-            // console.log(listaConceptos.length + conceptos.length);
 
             if( (conceptos.length + listaConceptos.length) < index ){
               setTimeout(() => {
-                // setDespliegue(true);
                 showToast('Se utilizaron todos los materiales disponibles.', '#E5BE01');
               }, 200);  
               clearTimeout();
             }else{
               setHabilitado(true);
               listaConceptos.push({
-                keyConceptos: listaConceptos.length + 1,
+                keyConceptos: index + excepcion,
                 titulo: conceptoSeleccionado,
                 cantidad: cantidad
               }); 
-              // index = index + 1;
-  
-              // console.log(listaConceptos);
+              setExcepcion(excepcion + 1);
               conceptos.forEach((item)=>{
                 if(item.title !== conceptoSeleccionado){
-                  // console.log(valorMat);
                   temp.push({id: x, title: item.title });
                   x = x + 1;
                 }
@@ -202,7 +200,6 @@ const EntradaConceptos = (props) => {
                 ),
                 Number(cantidad)
               );
-                      // console.log(temp);
               setConceptos(temp);
               setCantidad('');
               let send = cantidadC + 1;

@@ -4,31 +4,106 @@ import {
   Text,
   FlatList,
   SafeAreaView,
-  StatusBar
+  StatusBar,
+  Platform, 
+  ActivityIndicator
 } from "react-native";
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback, useContext, useEffect } from "react";
 import { HelperText, TextInput, Button } from "react-native-paper";
 import { useFonts as Fuentes } from "expo-font";
 import { createIconSetFromIcoMoon } from "@expo/vector-icons";
 import AppLoading from "expo-app-loading";
 import { useFonts, Urbanist_400Regular } from "@expo-google-fonts/urbanist";
-import { Picker } from "@react-native-picker/picker";
 import { async } from "@firebase/util";
-import CoordenadasCab24 from "./CoordenadasCab24";
+import { AntDesign } from '@expo/vector-icons'; 
+import { getAuth } from "firebase/auth";
+import { getDatabase, child, get, ref, set, push } from "firebase/database";
+import * as Location from 'expo-location';
 
 const Cab24 = (props) => {
   const folio = props.folio;
   const [coordenadas, setCoordenadas] = useState(new Array());
   const [cantidad, setCantidad] = useState(0);
+  const [habilitado, setHabilitado] = useState(false);
+  // const [ubicacion, setUbicacion] = useState(null);
 
-  agregarItemCoordenadas = () => {
+  const db = getDatabase();
+  const auth = getAuth();
+  Location.setGoogleApiKey("AIzaSyCL6SrNElBbvIVhJtW3t_K4cn8OasyznsQ");
+
+  deleteItemById = (id) => {
+    console.log(id);
+
+    const filteredData = coordenadas.filter(item => item.keyCoordenadas !== id);
+    setCoordenadas(filteredData);
+
+      set(
+        child(
+        ref(db),
+        `foliosAsignados/${auth.currentUser.uid}/correctivo/activo/${folio}/conceptosUsados/CAB-024/${id}`
+        ),
+        null
+      );
+  }
+
+  agregarItemCoordenadas = async() => {
+    setHabilitado(true);
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== 'granted') {
+      console.log('Permission to access location was denied');
+      return;
+    }
+
+    let location = await Location.getCurrentPositionAsync();
+    let coordenada = location.coords.latitude.toString() + "," + location.coords.longitude.toString();
+    
+    const postListRef = ref(db, `foliosAsignados/${auth.currentUser.uid}/correctivo/activo/${folio}/conceptosUsados/CAB-024`);
+    const newPostRef = push(postListRef);
+    set(newPostRef, {
+      coordenada
+    });
+
+    let arrayId = newPostRef.toString().split('/');
+    let llave = arrayId[arrayId.length - 1];
+
     coordenadas.push({
-      keyCoordenadas: cantidad,
-      coordenadasData: "19.299268,-99.2231495",
+      keyCoordenadas: llave,
+      coordenadasData: coordenada,
     });
     let send = cantidad + 1;
     setCantidad(send);
+    return false;
   };
+
+  const cargarConceptos = useCallback(async()=>{
+
+    let i = 0;
+    let consulta1 = await get(
+      child(
+        ref(db),
+        `foliosAsignados/${auth.currentUser.uid}/correctivo/activo/${folio}/conceptosUsados/CAB-024`
+      )
+    )
+      .then((snapshot) => {
+        // console.log(snapshot);
+        snapshot.forEach((element) => {
+          coordenadas.push({
+            keyCoordenadas: element.key,
+            coordenadasData: element.val().coordenada,
+          });
+          // let send = cantidad + 1;
+          i = i + 1;
+        });
+      })
+      .catch(function (err) {});
+      setCantidad(i);
+      console.log("Nueva cantidad: " + cantidad.toString());
+      // console.log(coordenadas);
+  });
+
+  useEffect(()=> {
+    cargarConceptos();
+  }, []);
 
   const Iconos = createIconSetFromIcoMoon(
     require("../../../../icons/selection.json"),
@@ -51,6 +126,7 @@ const Cab24 = (props) => {
         <FlatList
           ListEmptyComponent={null}
           data={coordenadas}
+          refreshing= {true}
           ListHeaderComponent={() => (
             <View style={styles.contenedorSelectMaterial}>
               <View style={{ width: "65%", height: 55, alignSelf: "flex-end" }}>
@@ -60,7 +136,7 @@ const Cab24 = (props) => {
                   underlineColor="transparent"
                   activeUnderlineColor="transparent"
                   selectionColor="black"
-                  value="CAB-24"
+                  value="CAB-024"
                   editable={false}
                 ></TextInput>
               </View>
@@ -73,12 +149,19 @@ const Cab24 = (props) => {
                   height: 55,
                 }}
               >
+                <ActivityIndicator
+                  size='small'
+                  color='black'
+                  style={ {display: habilitado ? 'flex' : 'none'} }
+                >
+                </ActivityIndicator>
                 <Iconos
                   name="agregar"
-                  style={styles.agregar}
+                  style={[styles.agregar, {display: habilitado ? 'none' : 'flex'}]}
                   size={45}
-                  onPress={() => {
-                    agregarItemCoordenadas();
+                  onPress={async() => {
+                    let listo = await agregarItemCoordenadas();
+                    setHabilitado(listo);
                   }}
                 ></Iconos>
               </View>
@@ -90,11 +173,56 @@ const Cab24 = (props) => {
             </View>
           )}
           renderItem={({ item }) => (
-            <CoordenadasCab24
-              folio={folio}
-              key={item.keyCoordenadas}
-              title={item.coordenadasData}
-            ></CoordenadasCab24>
+            <View>
+              <View style={{ width: "100%", flexDirection: "row", paddingVertical:5, paddingLeft:'7%' }}>
+                <View style={styles.contenedorBlancoCoordenadas}>
+                  <HelperText style={styles.helperCoordenadas}>Coordenada</HelperText>
+                  <View style={styles.contenedorGrisCoordenadas}>
+                    <Text>{item.coordenadasData}</Text>
+                  </View>
+                </View>
+                <View style={{ width: "18%", justifyContent: "center" }}>
+                  <Button
+                    mode="contained"
+                    compact={true}
+                    onPress={() => {
+                      console.log("Reubicando...");
+                    }}
+                    // contentStyle={{ height: 40 }}
+                    uppercase={false}
+                    color="white"
+                    style={{
+                      backgroundColor: "#2166E5",
+                      borderRadius: 50,
+                      alignSelf: 'flex-end',
+                    //   width: 50
+                    }}
+                  >
+                    <AntDesign name="find" size={22} color="white"/>
+                  </Button>
+                </View>
+                <View  style={{ width: "17%", justifyContent: "center" }}>
+                    <Button
+                        // mode="contained"
+                        compact={true}
+                        onPress={() => {
+                          deleteItemById(item.keyCoordenadas);
+                        }}
+                        // contentStyle={{ height: 40 }}
+                        uppercase={false}
+                        color="white"
+                        style={{
+                            backgroundColor: "#EC2137",
+                            borderRadius: 50,
+                            alignSelf: 'flex-end',
+                            //   width: 50
+                        }}
+                    >
+                        <Iconos name="borrar" size={25} color="white"/>
+                    </Button>
+                </View>
+              </View>
+            </View>
           )}
           keyExtractor={(item) => item.keyCoordenadas}
         ></FlatList>
@@ -145,6 +273,17 @@ const styles = StyleSheet.create({
     fontSize: 11,
     alignSelf: "flex-start",
     marginTop: "-6%",
+    zIndex: 999,
+    alignItems: "center",
+    justifyContent: "flex-start",
+  },
+  helperCoordenadas: {
+    height: 25,
+    fontWeight: "bold",
+    color: "black",
+    fontSize: 11,
+    alignSelf: "flex-start",
+    marginTop: "-5%",
     zIndex: 999,
     alignItems: "center",
     justifyContent: "flex-start",

@@ -4492,25 +4492,25 @@ expo-constants@~13.1.1:
     "@expo/config" "^6.0.14"
     uuid "^3.3.2"
 
-expo-dev-client@~0.9.4:
-  version "0.9.4"
-  resolved "https://registry.yarnpkg.com/expo-dev-client/-/expo-dev-client-0.9.4.tgz#016e3a5961fbbe2861d331c8a614e771ecf40d4c"
-  integrity sha512-qU7oLpg35ZcwZukU2xaPzv8wVfjZNddRodWszZAyLTDmltDVHodt3s77Tq21hmXy6Ho+NVaZgwIsR67Reiu6Gw==
+expo-dev-client@~0.9.5:
+  version "0.9.5"
+  resolved "https://registry.yarnpkg.com/expo-dev-client/-/expo-dev-client-0.9.5.tgz#257f10f2475051624f43a4c86d832f21afe41fde"
+  integrity sha512-cmbNe4vl8W+yHfsmwrdf9PZD4xBjpN7g2UAWMn1PHRpby26X59MyGQvrtOfZHxShHdhYGwmhfjUdjP31qHxjZQ==
   dependencies:
     "@expo/config-plugins" "^4.0.14"
-    expo-dev-launcher "0.11.4"
-    expo-dev-menu "0.10.5"
+    expo-dev-launcher "0.11.5"
+    expo-dev-menu "0.10.6"
     expo-dev-menu-interface "0.6.0"
     expo-manifests "~0.3.0"
     expo-updates-interface "~0.6.0"
 
-expo-dev-launcher@0.11.4:
-  version "0.11.4"
-  resolved "https://registry.yarnpkg.com/expo-dev-launcher/-/expo-dev-launcher-0.11.4.tgz#e3c89d63d76d14538b5c5ba02076f43d7c339fae"
-  integrity sha512-yMUDtOygu4r4YKV4TtR/c4pTQAZrzclSMSWtpB3TE3U3vTYrZkCx0yPHKbGlyzoKqoep7oYKqTEyWNCb325feg==
+expo-dev-launcher@0.11.5:
+  version "0.11.5"
+  resolved "https://registry.yarnpkg.com/expo-dev-launcher/-/expo-dev-launcher-0.11.5.tgz#206e80327ed658cc76f8fa9e39848bfabf066621"
+  integrity sha512-+wNBIWxoWCffbPJSt1fT0XOhnsk6sJqTFNAqFgACK8mCHxnFgrndZX4N3IQI60OGALvz1DqKil1RbwbUW2xbNQ==
   dependencies:
     "@expo/config-plugins" "^4.0.14"
-    expo-dev-menu "0.10.5"
+    expo-dev-menu "0.10.6"
     resolve-from "^5.0.0"
     semver "^7.3.5"
 
@@ -4519,10 +4519,10 @@ expo-dev-menu-interface@0.6.0:
   resolved "https://registry.yarnpkg.com/expo-dev-menu-interface/-/expo-dev-menu-interface-0.6.0.tgz#7721dc7e5bd3bbf3a570deb7c6464bc6fc5b5971"
   integrity sha512-RRBDMhVVKR85zok1qUp5gUhIELwl1cnZXSRPsPT0qZBsk3pYz5ZlFqYewFfczPjnxXQsP8ISqqYjwwVCzr7Z+A==
 
-expo-dev-menu@0.10.5:
-  version "0.10.5"
-  resolved "https://registry.yarnpkg.com/expo-dev-menu/-/expo-dev-menu-0.10.5.tgz#32f3b904b984e830ce0b454589758443af6209bb"
-  integrity sha512-K6WNBp0mv8/hFup7o4dNeIu0c4hFhDgB2dTd4Sjlc+S2JkcPpzg58sbfFElZFWRaGxHbA1cFulyBAAgqOHmYZg==
+expo-dev-menu@0.10.6:
+  version "0.10.6"
+  resolved "https://registry.yarnpkg.com/expo-dev-menu/-/expo-dev-menu-0.10.6.tgz#16220cff034a9759e9e2581ca54025df8c29e9e5"
+  integrity sha512-EUhqtzZe9r4dYkSpnS3J9BApiqUk/7Pw/jJxx3eHMRsMDDQ/M4TTWqJi5IVudTNdXCRxkQIH/S7Dl+uszMPeCw==
   dependencies:
     "@expo/config-plugins" "^4.0.14"
     expo-dev-menu-interface "0.6.0"
@@ -4562,6 +4562,13 @@ expo-linear-gradient@~11.3.0:
   version "11.3.0"
   resolved "https://registry.yarnpkg.com/expo-linear-gradient/-/expo-linear-gradient-11.3.0.tgz#855f470c9684f5b979c3c1be0ed1fe1943d57158"
   integrity sha512-gm0cULqE5cTP39HZHi+eCGgQ2qMcwym92DwSzRpA5nA4Ah5oKksV+PwD7zzo6YJt3X3lgqrTYEqts9VQISCTgw==
+
+expo-location@~14.2.2:
+  version "14.2.2"
+  resolved "https://registry.yarnpkg.com/expo-location/-/expo-location-14.2.2.tgz#5797f52be4e990b25e00bf6341be0c573c1393c1"
+  integrity sha512-P1v+huBWhuerV4okRhN0+Htx3Nw8LGWTUF66E5iwuZEWvLTYQEQ+Od0j2CvD4FY6rhncNpoIZcWVlIy5NmG4fg==
+  dependencies:
+    "@expo/config-plugins" "^4.0.14"
 
 expo-manifests@~0.3.0:
   version "0.3.0"
@@ -7259,10 +7266,10 @@ react-native-bootsplash@^4.1.4:
     fs-extra "^10.1.0"
     jimp "^0.16.1"
 
-react-native-codegen@^0.0.13:
-  version "0.0.13"
-  resolved "https://registry.yarnpkg.com/react-native-codegen/-/react-native-codegen-0.0.13.tgz#4cc94546fc75a5dbe9350d59c10108f2efe6bc17"
-  integrity sha512-rCh1P+s0Q4N6vNgS97ckafbhJRztz22+0l0VZoyQC06F07J98kI5cUByH0ATypPRIdpkMbAZc59DoPdDFc01bg==
+react-native-codegen@^0.0.17:
+  version "0.0.17"
+  resolved "https://registry.yarnpkg.com/react-native-codegen/-/react-native-codegen-0.0.17.tgz#83fb814d94061cbd46667f510d2ddba35ffb50ac"
+  integrity sha512-7GIEUmAemH9uWwB6iYXNNsPoPgH06pxzGRmdBzK98TgFBdYJZ7CBuZFPMe4jmHQTPOkQazKZ/w5O6/71JBixmw==
   dependencies:
     "@babel/parser" "^7.14.0"
     flow-parser "^0.121.0"
@@ -7281,10 +7288,20 @@ react-native-datepicker@^1.7.2:
   dependencies:
     moment "^2.22.0"
 
-react-native-gesture-handler@~2.2.0:
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/react-native-gesture-handler/-/react-native-gesture-handler-2.2.0.tgz#a551f9ca33d8766d0a24268f49e0f1b05191b105"
-  integrity sha512-WF25CNgn164bF9juW8N/jICIFXiEOgsxCuY7DRlnFdiH5ZfvMYtZHRC+zr1fFMap2ty1f2HWDQNVVSo0FDXP4A==
+react-native-geocoder@^0.5.0:
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/react-native-geocoder/-/react-native-geocoder-0.5.0.tgz#ff4b9c55d5768a4784eefccb411761c82e067579"
+  integrity sha1-/0ucVdV2ikeE7vzLQRdhyC4GdXk=
+
+react-native-geocoding@^0.5.0:
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/react-native-geocoding/-/react-native-geocoding-0.5.0.tgz#69748f896047a63d1c3c1d55255f9d67c8e275c2"
+  integrity sha512-peTXRpRxPLiZpbTW43AOvoXXAEoS+eLnSo4KRY0hcL9F2hulWE5r7o5KiaLx8AWj35c6EJP3fdGHe754q2Gd2Q==
+
+react-native-gesture-handler@~2.2.1:
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/react-native-gesture-handler/-/react-native-gesture-handler-2.2.1.tgz#672258aa5a40c92a97c736bdde0a8bd6c8c6c692"
+  integrity sha512-P4kAPbSY8VFAjvFNzfePgFsbZEldfEnEfNqOJw6MlpcdXrPGwRbvMqWMVkA9lifdKTZ3XifvAgJ8+R+uEZN0zA==
   dependencies:
     "@egjs/hammerjs" "^2.0.17"
     hoist-non-react-statics "^3.3.0"
@@ -7423,10 +7440,10 @@ react-native-web@0.17.7:
     normalize-css-color "^1.0.2"
     prop-types "^15.6.0"
 
-react-native@0.68.1:
-  version "0.68.1"
-  resolved "https://registry.yarnpkg.com/react-native/-/react-native-0.68.1.tgz#c3d92f89028cdc2453fe7cd2d532b3f68d1c27c8"
-  integrity sha512-5gfvslo5NO2Ece2k/q41eVOK3ca4u1QAOf+qM+auvOiUA4/QR5Yr0WfSGbRpUr2GaFgv7qP11F4+elCravg7uQ==
+react-native@0.68.2:
+  version "0.68.2"
+  resolved "https://registry.yarnpkg.com/react-native/-/react-native-0.68.2.tgz#07547cd31bb9335a7fa4135cfbdc24e067142585"
+  integrity sha512-qNMz+mdIirCEmlrhapAtAG+SWVx6MAiSfCbFNhfHqiqu1xw1OKXdzIrjaBEPihRC2pcORCoCHduHGQe/Pz9Yuw==
   dependencies:
     "@jest/create-cache-key-function" "^27.0.1"
     "@react-native-community/cli" "^7.0.3"
@@ -7450,7 +7467,7 @@ react-native@0.68.1:
     pretty-format "^26.5.2"
     promise "^8.0.3"
     react-devtools-core "^4.23.0"
-    react-native-codegen "^0.0.13"
+    react-native-codegen "^0.0.17"
     react-native-gradle-plugin "^0.0.6"
     react-refresh "^0.4.0"
     react-shallow-renderer "16.14.1"

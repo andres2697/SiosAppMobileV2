@@ -103,8 +103,6 @@
                     });
                   });
 
-                  console.log(lista);
-
                   navigation.navigate('Miscelaneos', {
                     folio: folio, lista: lista
                   });
@@ -131,6 +129,26 @@
                   // console.log("tocaste el ícono");
                   let lista = new Array();
                   let i = 0;
+                  let arreglo2 = new Array();
+
+                  let consulta1 = await get(
+                    child(
+                      ref(db),
+                      `foliosAsignados/${auth.currentUser.uid}/correctivo/activo/${folio}/materialesUsados/TP`
+                    )
+                  )
+                    .then((snapshot) => {   
+                      // console.log(snapshot);    
+                      let x = 0;
+                      snapshot.forEach(element => {
+                        // lista.push({title: element.key, id: i});
+                        // i = i + 1;
+                        arreglo2[x] = element.key;
+                        x = x + 1;
+                      });
+                    })
+                    .catch(function (err) {});
+
                   await get(
                     child(
                       ref(db),
@@ -146,6 +164,17 @@
                       });
                     })
                     .catch(function (err) {});
+                  // console.log(lista);
+
+                  arreglo2.forEach((valor) => {
+                    lista = lista.filter((element)=>{
+                      // console.log(valor);
+                      if(element.title != valor){
+                        return valor;
+                      };
+                    });
+                  });
+
                   navigation.navigate('MaterialesTP', {
                     folio: folio, lista: lista
                   });

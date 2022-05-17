@@ -88,6 +88,7 @@ import {
                         setTituloPagina('Folio correctivo');
                         // console.log(estado);
                         if(element.val()['estado'] == 1){
+                            // console.log(element.val()['horaLlegada']['fecha']);
                             setFechaInicio(element.val()['horaInicio']['fecha']);
                             setHoraInicio(element.val()['horaInicio']['hora']);
                         }

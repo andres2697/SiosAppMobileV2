@@ -32,7 +32,7 @@ const Conceptos = (props) => {
   const db = getDatabase();
   const auth = getAuth();
 
-  const cargarConceptos = useCallback(async () => {
+  const cargarConceptos = useCallback(async()=>{
     let x = 0;
     // let lista = new Array();
     let i = 0;
@@ -50,8 +50,10 @@ const Conceptos = (props) => {
         snapshot.forEach((element) => {
           // lista.push({title: element.key, id: i});
           // i = i + 1;
-          arreglo2.push({keyConceptos: i, titulo: element.key, cantidad: element.val()});
-          i = i + 1;
+          if(element.key != 'CAB-024'){
+            arreglo2.push({keyConceptos: i, titulo: element.key, cantidad: element.val()});
+            i = i + 1;
+          }
         });
       })
       .catch(function (err) {});
@@ -68,12 +70,10 @@ const Conceptos = (props) => {
       });
 
       setConceptos(arreglo2);
-      // setConceptosBD(arreglo2);
-      // console.log(lista);
       setListaConceptos(lista);
   });
 
-  useEffect(() => {
+  useEffect(()=> {
     cargarConceptos();
   }, []);
 

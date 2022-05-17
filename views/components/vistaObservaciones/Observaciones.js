@@ -59,6 +59,7 @@
     return (
         <KeyboardAvoidingView
             behavior={Platform.OS === "ios" ? "padding" : "height"}
+            // keyboardVerticalOffset={80}
             keyboardVerticalOffset={80}
             style={[styles.contenedorPrincipal]}
         >
