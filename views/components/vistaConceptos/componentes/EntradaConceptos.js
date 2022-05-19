@@ -118,9 +118,13 @@ const EntradaConceptos = (props) => {
           </View>
         )}
         renderItem={({ item }) => (
-          <View style={[styles.contenedorConceptos, { marginBottom: 5 }]}>
-            <Text> {item.titulo} </Text>
-            <Text> {item.cantidad} </Text>
+          <View style={[styles.contenedorConceptos, { marginBottom: 20 }]}>
+            <View style={{width:'56%'}}>
+              <Text style={{fontSize: 16}}> {item.titulo} </Text>
+            </View>
+            <View style={{width:'30%'}}>
+              <Text style={{fontSize: 16, fontWeight: '600'}}> {item.cantidad} </Text>
+            </View>
             <View style={{ width: "15%", alignSelf: "center", height: 55 }}>
               <Iconos
                 name="borrar"
@@ -248,10 +252,11 @@ const styles = StyleSheet.create({
     zIndex: 999,
   },
   contenedorConceptos: {
-    width: "85%",
-    flexDirection: "column",
+    width: "80%",
+    flexDirection: "row",
     alignSelf: "center",
-    // marginTop: 5,
+    alignItems: 'center',
+    justifyContent: 'space-between',
     marginBottom: 35,
   },
   inputCustomizedInfo: {

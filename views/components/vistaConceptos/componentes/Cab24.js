@@ -185,8 +185,41 @@ const Cab24 = (props) => {
                   <Button
                     mode="contained"
                     compact={true}
-                    onPress={() => {
-                      console.log("Reubicando...");
+                    onPress={async() => {
+                      let { status } = await Location.requestForegroundPermissionsAsync();
+                      if (status !== 'granted') {
+                        console.log('Permission to access location was denied');
+                        return;
+                      }
+                  
+                      let location = await Location.getCurrentPositionAsync();
+                      let coordenada = location.coords.latitude.toString() + "," + location.coords.longitude.toString();
+
+                      // item.coordenadasData = coordenada;
+                      let actualizarUbicacion = new Array();
+                      coordenadas.forEach((element) => {
+                        if(element.keyCoordenadas === item.keyCoordenadas){
+                          actualizarUbicacion.push({
+                            keyCoordenadas: element.keyCoordenadas,
+                            coordenadasData: coordenada,
+                          });
+                        }else{
+                          actualizarUbicacion.push({
+                            keyCoordenadas: element.keyCoordenadas,
+                            coordenadasData: element.coordenadasData,
+                          });
+                        }
+                      });
+
+                      setCoordenadas(actualizarUbicacion);
+
+                      set(
+                        child(
+                        ref(db),
+                        `foliosAsignados/${auth.currentUser.uid}/correctivo/activo/${folio}/conceptosUsados/CAB-024/${item.keyCoordenadas}/coordenada`
+                        ),
+                        coordenada
+                      );
                     }}
                     // contentStyle={{ height: 40 }}
                     uppercase={false}
@@ -241,7 +274,11 @@ const styles = StyleSheet.create({
   contenedorSelectMaterial: {
     width: "60%",
     flexDirection: "row",
-    padding: 8,
+    paddingRight: 8,
+    paddingLeft: 8,
+    paddingTop: 8,
+    paddingBottom: 8,
+    marginBottom: 3,
     elevation: 4,
     backgroundColor: "white",
     borderRadius: 10,

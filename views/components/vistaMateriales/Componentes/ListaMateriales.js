@@ -143,8 +143,12 @@ import {
             keyExtractor={(item) => item.key}
             renderItem={({ item, index }) => (
               <View style={[styles.contenedorListaMiscelaneos, { marginBottom: 5 }]}>
-                <Text> {item.titulo} </Text>
-                <Text> {item.cantidad} </Text>
+                <View style={{width:'56%'}}>
+                  <Text style={{fontSize: 16}}> {item.titulo} </Text>
+                </View>
+                <View style={{width:'30%'}}>
+                  <Text style={{fontSize: 16, fontWeight: '600'}}> {item.cantidad} </Text>
+                </View>
                 <View style={{ width: '15%', alignSelf:"center", height: 55 }}>
                   <Iconos 
                     name="borrar" style={styles.eliminar} size={45} 
@@ -156,7 +160,7 @@ import {
               </View>
             )}
           ></FlatList>
-          <View style={{ width: '100%', justifyContent: "center", alignItems: "center", paddingBottom: 30 }}>
+          <View style={{ width: '100%', justifyContent: "center", alignItems: "center", paddingBottom: 30, paddingTop: 30 }}>
                 <EntradaMateriales 
                   folio={folio} 
                   tipoMaterial={tipoMaterial}
@@ -280,10 +284,13 @@ import {
     },
     contenedorListaMiscelaneos: {
         width: "80%",
-        flexDirection: "column",
+        flexDirection: "row",
         alignSelf: "center",
+        alignItems: 'center',
+        justifyContent: 'space-between',
         marginTop: 25,
         marginBottom: 35,
+        // backgroundColor: 'red'
       //   paddingLeft: '7.5%',
       //   paddingRight: '7.5%'
     },   

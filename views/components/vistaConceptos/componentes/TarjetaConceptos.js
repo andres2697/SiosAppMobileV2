@@ -61,7 +61,7 @@ import {
     return (
           <View style={[styles.contenedorMaterialesTP, { marginBottom: 5 }]}>
             <View style={styles.contenedorSelectMaterial}>
-              <View style={{ width: "60%", height: 55, alignSelf: "center" }}>
+              <View style={{ width: "78%", height: 58, alignSelf: "center" }}>
                 <HelperText style={styles.helperMaterial}>Concepto</HelperText>
                 <Picker
                   style={styles.selector}
@@ -136,7 +136,7 @@ import {
     selector: {
       backgroundColor: "#EDF2F9",
       // height: 35,
-      marginTop: "-7%",
+      marginTop: "-4%",
       // borderRadius: 10
     },
     itemSelector: {
@@ -183,7 +183,7 @@ import {
       color: "black",
       fontSize: 11,
       alignSelf: "flex-start",
-      marginTop: "-5%",
+      marginTop: "-4%",
       zIndex: 1,
       alignItems: "center",
       justifyContent: "flex-start",
