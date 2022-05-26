@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, Animated, useWindowDimensions, ActivityIndicato
 import React, { useEffect, useState } from 'react';
 import Dashboard from '../../views/Dashboard';
 import Correctivo from '../../views/Correctivo';
+import Preventivo from '../../views/Preventivo';
 import { useFonts, Urbanist_400Regular } from '@expo-google-fonts/urbanist';
 import AppLoading from "expo-app-loading";
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList, DrawerItem} from '@react-navigation/drawer';
@@ -10,6 +11,7 @@ import 'react-native-gesture-handler';
 import { createIconSetFromIcoMoon } from "@expo/vector-icons";
 import { useFonts as Fuentes } from "expo-font";
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { getAuth } from "firebase/auth";
 
 const Drawer = createDrawerNavigator();
 
@@ -19,6 +21,9 @@ const Sidebar = () => {
     const [animation, setAnimation] = useState(new Animated.Value(0));
     const [estado, setEstado] = useState(false);
     const [retardo, setRetardo] = useState(false);
+
+    const auth = getAuth();
+    const navigation = useNavigation();
 
     const animatedStyles = {
         height: animation,
@@ -105,6 +110,7 @@ const Sidebar = () => {
                                 style={ styles.drawerItemStyle }
                                 label="Notificaciones"
                                 labelStyle={ styles.drawerItemLabelStyle }
+                                activeBackgroundColor={'rgbo: (255, 255, 255, 0.5)'}
                                 onPress={() => {
                                     props.navigation.navigate("Screen1");
                                 }}
@@ -116,6 +122,7 @@ const Sidebar = () => {
                             <DrawerItem
                                 style={ styles.drawerItemStyle }
                                 label="Dashboard"
+                                activeBackgroundColor={'rgbo: (255, 255, 255, 0.5)'}
                                 labelStyle={ styles.drawerItemLabelStyle }
                                 onPress={() => {
                                     props.navigation.navigate("Dashboard");
@@ -129,6 +136,7 @@ const Sidebar = () => {
                                 <DrawerItem
                                     style={ styles.drawerItemStyle }
                                     label="Folios asignados"
+                                    activeBackgroundColor={'rgbo: (255, 255, 255, 0.5)'}
                                     labelStyle={ styles.drawerItemLabelStyle }
                                     onPress={() => {
                                         degrees == 0 ? setDegrees(1) : setDegrees(0);
@@ -158,9 +166,10 @@ const Sidebar = () => {
                                     <DrawerItem
                                         style={ styles.drawerItemStyle }
                                         label="Preventivo"
+                                        activeBackgroundColor={'rgbo: (255, 255, 255, 0.5)'}
                                         labelStyle={ styles.drawerItemLabelStyle }
                                         onPress={() => {
-                                            props.navigation.navigate("Screen1");
+                                            props.navigation.navigate("Preventivo");
                                         }}
                                         />
                                 </View>
@@ -169,6 +178,7 @@ const Sidebar = () => {
                                     <DrawerItem
                                         style={ styles.drawerItemStyle }
                                         label="Correctivo"
+                                        activeBackgroundColor={'rgbo: (255, 255, 255, 0.5)'}
                                         labelStyle={ styles.drawerItemLabelStyle }
                                         onPress={() => {
                                             props.navigation.navigate("Correctivo");
@@ -183,6 +193,7 @@ const Sidebar = () => {
                             <DrawerItem
                                 style={ [styles.drawerItemStyle, {paddingRight: 5}] }
                                 label="Tema"
+                                activeBackgroundColor={'rgbo: (255, 255, 255, 0.5)'}
                                 labelStyle={ styles.drawerItemLabelStyle }
                                 onPress={() => {
                                     props.navigation.navigate("Screen1");
@@ -195,6 +206,7 @@ const Sidebar = () => {
                             <DrawerItem
                                 style={ styles.drawerItemStyle }
                                 label="Avisos"
+                                activeBackgroundColor={'rgbo: (255, 255, 255, 0.5)'}
                                 labelStyle={ styles.drawerItemLabelStyle }
                                 onPress={() => {
                                     props.navigation.navigate("Screen1");
@@ -207,8 +219,15 @@ const Sidebar = () => {
                                 style={ [styles.drawerItemStyle, {paddingRight: 40}] }
                                 label="Salir"
                                 labelStyle={ styles.drawerItemLabelStyle }
-                                onPress={() => {
-                                    props.navigation.navigate("Screen1");
+                                onPress={async() => {
+                                    // props.navigation.navigate("Login");
+                                    let cerrarSesion = await auth
+                                                                .signOut()
+                                                                .then(() => console.log('User signed out!'));
+                                    navigation.reset({
+                                        index: 0,
+                                        routes: [{ name: 'Login' }],
+                                    });
                                 }}
                                 />
                         </View>
@@ -221,6 +240,7 @@ const Sidebar = () => {
         // <NavigationContainer>
             <Drawer.Navigator 
                 initialRouteName="Dashboard"
+                
                 drawerContent={(props) => <CustomDrawerContent {...props} />}
             >
                 {/* <Drawer.Screen
@@ -230,15 +250,19 @@ const Sidebar = () => {
                 /> */}
                 <Drawer.Screen
                     // drawerContent={(props) => <CustomDrawerContent {...props} />}
-                    options={{ headerShown: false }}
                     name="Dashboard"
                     component={Dashboard}
-                />
+                    />
                 <Drawer.Screen
                     // drawerContent={(props) => <CustomDrawerContent {...props} />}
-                    options={{ headerShown: false }}
                     name="Correctivo"
                     component={Correctivo}
+                />
+                <Drawer.Screen
+                    options={{ headerShown: false }}
+                    name="Preventivo"
+                    component={Preventivo}
+                    initialParams={{img: false }}
                 />
             </Drawer.Navigator>
         // </NavigationContainer>
@@ -300,7 +324,7 @@ const styles = StyleSheet.create({
     drawerItemStyle: {
         flex: 1, 
         width: '100%',
-        marginBottom: -2
+        marginBottom: -2,
     }, 
     drawerItemLabelStyle: {
         color: "white", 

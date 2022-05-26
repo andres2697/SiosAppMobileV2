@@ -11,10 +11,12 @@ import { RootSiblingParent } from 'react-native-root-siblings';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import 'react-native-gesture-handler';
 import Sidebar from './views/components/Sidebar';
+import Camara from './views/components/Camara';
 import Conceptos from './views/components/vistaConceptos/Conceptos';
 import MaterialesTP from './views/components/vistaMateriales/MaterialesTP';
 import Miscelaneos from './views/components/vistaMateriales/Miscelaneos';
 import Observaciones from './views/components/vistaObservaciones/Observaciones';
+import Correctivo from './views/Correctivo';
 import { Video } from 'expo-av';
 import * as SplashScreen from 'expo-splash-screen';
 // import fondo from "./assets/";
@@ -84,6 +86,11 @@ export default function App() {
               options={{ headerShown: false }}
             />
             <Stack.Screen 
+              name="Correctivo" 
+              component={Correctivo} 
+              options={{ title: 'Correctivo', headerBackButtonMenuEnabled: true, headerTitleStyle: {fontWeight: 'bold'} }}
+            />
+            <Stack.Screen 
               name="Miscelaneos" 
               component={Miscelaneos} 
               options={{ title: 'Miscelaneos', headerBackButtonMenuEnabled: true, headerTitleStyle: {fontWeight: 'bold'} }}
@@ -102,6 +109,12 @@ export default function App() {
               name="Observaciones" 
               component={Observaciones} 
               options={{ title: 'Observaciones', headerBackButtonMenuEnabled: true, headerTitleStyle: {fontWeight: 'bold'} }}
+            />
+            <Stack.Screen 
+              name="Camara" 
+              component={Camara} 
+              options={{ headerBackButtonMenuEnabled: false, headerShown: false}}
+              initialParams={{ img: false }}
             />
           </Stack.Navigator>
         </NavigationContainer>

@@ -88,10 +88,6 @@ const LoginForm = () => {
         if (regexp) {
             signInWithEmailAndPassword(auth, datos.email, datos.pass)
             .then((userCredentials) => {
-                // const timeout = setTimeout(() => {
-                //   setIsLoading(false);
-                // }, 1000);
-                // clearTimeout(timeout);
               navigation.reset({
                   index: 0,
                   routes: [
@@ -101,23 +97,12 @@ const LoginForm = () => {
                     }
                   ]
                 });
-                // navigation.reset(
-                //   [
-                //     NavigationActions.navigate(
-                //       {
-                //         routeName: 'Sidebar',
-                //         params: {user: datos.email}
-                //       }
-                //     )
-                //   ]
-                // );
               })
             .catch((error) => {
                 switch (error.code) {
                     case 'auth/wrong-password':
                         setTimeout(() => {
                             setDespliegue(true);
-                            // setErrorPass('red');
                             showToast('Campo(s) incorrecto(s), favor de verificar');
                         }, 2000); 
                         clearTimeout();
@@ -125,7 +110,6 @@ const LoginForm = () => {
                     case 'auth/user-not-found':
                         setTimeout(() => {
                           setDespliegue(true);
-                            // setErrorCorreo('red')
                           showToast('Campo(s) incorrecto(s), favor de verificar');
                         }, 2000); 
                       clearTimeout();
@@ -134,10 +118,7 @@ const LoginForm = () => {
                         console.log(error);
                     break;
                 }
-            });
-            // setTimeout(() => {
-            // setDespliegue(true);
-            // }, 2000);    
+            }); 
         }else{
             setTimeout(() => {
                 setDespliegue(true);
