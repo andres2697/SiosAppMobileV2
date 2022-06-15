@@ -17,7 +17,7 @@ import {
   import AppLoading from "expo-app-loading";
   import { signInWithEmailAndPassword } from "firebase/auth";
   import Toast from 'react-native-root-toast';
-  import { useNavigation } from '@react-navigation/native';
+  import { useNavigation, useRoute } from '@react-navigation/native';
   import Cabecera from "./components/Cabecera";
   import { useFonts, Urbanist_400Regular } from "@expo-google-fonts/urbanist";
   import { getDatabase, child, get, ref, limitToFirst } from 'firebase/database'; 
@@ -35,8 +35,10 @@ import {
   
   const Correctivo = () => {
 
-    const navigation = useNavigation();
+    const navigation = useNavigation();    
+    const route = useRoute();
     const [cargado, setCargado] = useState(false);
+    // const navegacion = route.params.navigation;
 
     const [animation, setAnimation] = useState(new Animated.Value(0));
     const [animationO, setAnimationE] = useState(new Animated.Value(1));
@@ -190,7 +192,7 @@ import {
             cargarInfoFolio();
         }, []);
 
-    startAnimate = (valorNuevo, valorNuevoE, colores, tiempo) => {
+    const startAnimate = (valorNuevo, valorNuevoE, colores, tiempo) => {
         setBurbuja1(colores[0]);
         setLinea1(colores[1]);
         setBurbuja2(colores[2]);
@@ -226,7 +228,7 @@ import {
         setHoraInicio(tiempo[3] + ':' + tiempo[4]);
     };
 
-    startAnimate2 = (valorNuevo, valorNuevoE, colores) => {
+    const startAnimate2 = (valorNuevo, valorNuevoE, colores) => {
         setBurbuja1(colores[0]);
         setLinea1(colores[1]);
         setBurbuja2(colores[2]);
@@ -296,7 +298,7 @@ import {
     }else{
         return (
             <View style={styles.contenedorPrincipal}>
-                <Cabecera></Cabecera>
+                {/* <Cabecera navigation={navegacion}></Cabecera> */}
                 <ScrollView>
                     
                     <InfoExtra 

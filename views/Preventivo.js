@@ -15,7 +15,7 @@ import { NavigationActions } from 'react-navigation';
 import { GLView } from 'expo';
 import Expo2DContext from 'expo-2d-context';
 
-const Preventivo = () => {
+const Preventivo = (props) => {
     const route = useRoute();
     const navigation = useNavigation();
 
@@ -110,7 +110,7 @@ const Preventivo = () => {
     }else{
             return (
               <View style={styles.contenedorPrincipal}>
-                <Cabecera></Cabecera>
+                {/* <Cabecera navigation={navigation}></Cabecera> */}
                 <View
                   style={{
                     width: "100%",

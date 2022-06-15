@@ -10,13 +10,16 @@ import { createIconSetFromIcoMoon } from "@expo/vector-icons";
 import AppLoading from "expo-app-loading";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import Toast from 'react-native-root-toast';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, DrawerActions } from '@react-navigation/native';
 import SvgComponent from '../../assets/img/svg/logo_barra_svg.js';
 import { createDrawerNavigator } from '@react-navigation/drawer';
+// import { DrawerActions } from 'react-navigation';
+// import Tabs from '../components/Tab/Tabs'
+// import Sidebar from '../components/Sidebar/Sidebar'
   
-const Cabecera = () => {
+const Cabecera = ({navigation}) => {
 
-    const navigation = useNavigation();
+    const navigation2 = useNavigation();
 
     const Iconos = createIconSetFromIcoMoon(
         require("../../icons/selection.json"),
@@ -30,13 +33,24 @@ const Cabecera = () => {
     if (!iconsLoaded) {
         return <AppLoading />;
     }
+    
 
     return(
         <View style={styles.contenedorPrincipal}>
             <View style={styles.box1}>
-                <Iconos name="hamburguesa" size={50} onPress= {
-                        () => navigation.openDrawer()
-                    }
+                <Iconos name="hamburguesa" size={50} 
+                    onPress= {()=>{
+                        // navigation.dispatch(DrawerActions.openDrawer());
+                        // () => navigation.dispatch(DrawerActions.toggleDrawer())
+                        // props.navigationProps.toggleDrawer();
+                        if(navigation.openDrawer === undefined){
+                            navigation2.dispatch(DrawerActions.openDrawer());
+                            console.log(navigation2.dispatch());
+                            console.log('presionaste');
+                        }else{
+                            navigation.openDrawer();
+                        }
+                    } }                   
                 />
             </View>
             <View style={styles.box2}>

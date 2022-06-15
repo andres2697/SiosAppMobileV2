@@ -5,25 +5,35 @@ import { KeyboardAvoidingView } from "react-native";
 import fondo from "../assets/img/fondo.png";
 import SvgComponent from '../assets/img/svg/logo_svg.js';
 import LoginForm  from './components/LoginForm.js';
+import { createIconSetFromIcoMoon } from "@expo/vector-icons";
+import { useFonts, Urbanist_400Regular } from "@expo-google-fonts/urbanist";
+import { useFonts as Fuentes} from "expo-font";
+import AppLoading from "expo-app-loading";
 
+const Login = (props) => {
+  const Iconos = createIconSetFromIcoMoon(
+      require("../icons/selection.json"),
+      "IcoMoon",
+      "icomoon.ttf"
+  );
+  const [iconsLoaded] = Fuentes({
+      IcoMoon: require("../icons/icomoon.ttf"),
+  });
+  const [fontsLoaded] = useFonts({
+      Urbanist_400Regular,
+  });
 
-class Login extends React.Component {
-  constructor(props){
-    super(props);
-    this.state = {
-    }
+  if (!iconsLoaded || !fontsLoaded) {
+      return <AppLoading />;
   }
-  render(){
     return (
         <KeyboardAvoidingView
-          style={styles.container}
           behavior={Platform.OS === "ios" ? "padding" : "height"}
            keyboardVerticalOffset={-220}>
     
           <ImageBackground resizeMode="cover" source={fondo} style={styles.imagen}>
             <View style={styles.containerGeneral}>
               <View style={[styles.viewsContainer, styles.inputContainer]}>
-                        {/* <Logo/> */}
                 <View style={styles.contenedorLogo}>
                   <SvgComponent></SvgComponent>
                 </View>
@@ -36,7 +46,6 @@ class Login extends React.Component {
           </ImageBackground>
         </KeyboardAvoidingView>
     );
-  }
 }
   
 export default Login;

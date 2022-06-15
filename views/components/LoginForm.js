@@ -19,7 +19,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useNavigation, NavigationAction } from '@react-navigation/native';
 import { NavigationActions } from 'react-navigation';
 
-const LoginForm = () => {
+const LoginForm = (props) => {
   const [email, setText] = useState("");
   const [passVisibility, setBool] = useState(true);
   const [pass, setPass] = useState("");
@@ -29,7 +29,7 @@ const LoginForm = () => {
 
   const navigation = useNavigation();
 
-  validate = (text) => {
+  const validate = (text) => {
     // console.log(text);
     let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/;
     if (reg.test(text) === false) {
@@ -40,7 +40,7 @@ const LoginForm = () => {
     }
   }
 
-  showToast = (message) =>{
+  const showToast = (message) =>{
     // ToastAndroid.show(message, ToastAndroid.SHORT, styles.tostada);
     let toast = Toast.show(message, {
         duration: Toast.durations.SHORT,
@@ -76,7 +76,7 @@ const LoginForm = () => {
     clearTimeout();
   }
 
-  iniciarSesion = async (datos) => {
+  const iniciarSesion = async (datos) => {
     if (datos.email == '' || datos.pass == '') {
         setTimeout(() => {
             setDespliegue(true);
@@ -93,6 +93,7 @@ const LoginForm = () => {
                   routes: [
                     {
                       name: "Sidebar",
+                      // name: "Sidebar",
                       params: { user: userCredentials.user.displayName }
                     }
                   ]

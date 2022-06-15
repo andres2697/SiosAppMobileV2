@@ -13,11 +13,11 @@ import {
   import AppLoading from "expo-app-loading";
   import { signInWithEmailAndPassword } from "firebase/auth";
   import Toast from 'react-native-root-toast';
-  import { useNavigation } from '@react-navigation/native';
   import Cabecera from "./components/Cabecera";
+  import { useNavigation } from '@react-navigation/native';
   
   const Dashboard = () => {
-
+      
     const navigation = useNavigation();
 
     const Iconos = createIconSetFromIcoMoon(
@@ -35,7 +35,7 @@ import {
     
     return (
         <View style={styles.contenedorPrincipal}>
-            <Cabecera></Cabecera>
+            <Cabecera navigation={navigation}></Cabecera>
             <View style={styles.contenedorComponente}>
                 <Text>
                     Hola desde Dashboard
