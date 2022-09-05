@@ -8,9 +8,9 @@ import { RootSiblingParent } from 'react-native-root-siblings';
 import 'react-native-gesture-handler';
 import { Video } from 'expo-av';
 import * as SplashScreen from 'expo-splash-screen';
-import Tabs from "./views/components/Tab/Tabs";
+// import Tabs from "./views/components/Tab/Tabs";
 import Stack from "./views/components/Stack/Stack";
-import Sidebar from './views/components/Sidebar/Sidebar';
+// import Sidebar from './views/components/Sidebar/Sidebar';
 import { navigationRef } from './views/RootNavigation';
 import { getAuth } from "firebase/auth";
 

@@ -8,7 +8,7 @@ import {
   Animated,
   // ScrollView,
 } from "react-native";
-import React from "react";
+import React, { Suspense } from "react";
 import { ScrollView } from "react-native-virtualized-view";
 import { useState, useEffect, useCallback } from "react";
 import { Button, HelperText, TextInput as Paper } from "react-native-paper";
@@ -71,17 +71,25 @@ const Correctivo = () => {
   const [tituloPagina, setTituloPagina] = useState("");
 
   const cargarInfoFolio = useCallback(async () => {
+    let folioKey;
+    let tipoFolio; 
     const folio = await get(child(ref(database), 
-            `foliosAsignados/${auth.currentUser.uid}/correctivo/activo`,
-            limitToFirst(1)
+            `foliosAsignados/correctivos/activo/${auth.currentUser.uid}`
         ))
         .then((snapshot)=>{
-            console.log(snapshot);
+            // console.log(snapshot.val());
+            snapshot.forEach((folio)=>{
+                // console.log(folio.key);
+                tipoFolio = folio.key;
+                folioKey = Object.keys(folio.val())[0];
+            })
     });
+    console.log(folioKey);
+    console.log(tipoFolio);
     const variables = await get(
       child(
         ref(database),
-        `foliosAsignados/${auth.currentUser.uid}/correctivo/activo`,
+        `folios/correctivos/${tipoFolio}/${folioKey}`,
         limitToFirst(1)
       )
     )
@@ -89,7 +97,7 @@ const Correctivo = () => {
         // console.log(snapshot);
         snapshot.forEach((element) => {
           setFolio(element.key);
-          setTipoFolio(element.val()["tipo"]);
+          setTipoFolio(tipoFolio);
           setDistrito(element.val()["distrito"]);
           setCluster(element.val()["cluster"]);
           setFalla(element.val()["falla"]);

@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import "react-native-gesture-handler";
 import { createStackNavigator } from "@react-navigation/stack";
-import { StyleSheet, View } from "react-native";
+import { View } from "react-native";
 // import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import Sidebar from "../Sidebar/Sidebar";
@@ -12,8 +12,6 @@ import { useFonts, Urbanist_400Regular } from "@expo-google-fonts/urbanist";
 import { useFonts as Fuentes } from "expo-font";
 import AppLoading from "expo-app-loading";
 import { getAuth } from "firebase/auth";
-import { useNavigation, useRoute } from "@react-navigation/native";
-import Tabs from "../Tab/Tabs";
 import Miscelaneos from '../vistaMateriales/Miscelaneos';
 import MaterialesTP from '../vistaMateriales/MaterialesTP';
 import Conceptos from '../vistaConceptos/Conceptos';
