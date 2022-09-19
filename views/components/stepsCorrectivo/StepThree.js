@@ -19,10 +19,11 @@ import {
   import Toast from "react-native-root-toast";
   import { useNavigation } from "@react-navigation/native";
   import { useFonts, Urbanist_400Regular } from "@expo-google-fonts/urbanist";
-  import { getDatabase, child, get, ref, limitToFirst } from 'firebase/database';
+  import { getDatabase, child, get, ref, update } from 'firebase/database';
   
   const StepThree = (props) => {
     const navigation = useNavigation();
+    const database = getDatabase();
   
     const Iconos = createIconSetFromIcoMoon(
       require("../../../icons/selection.json"),
@@ -46,7 +47,12 @@ import {
           <TouchableOpacity
             style={[styles.button]}
             onPress={async () => {
-              console.log('hola desde componente 3');
+              // console.log('hola desde componente 3');
+              await update(child(ref(database), `folios/correctivos/${props.tipoFolio}/${props.folio}`), {
+                estatus: 4,
+              }).then((snapshot)=>{
+                navigation.navigate('Dashboard');
+              });
             }}
           >
             <Text style={styles.buttonText}>Dashboard</Text>

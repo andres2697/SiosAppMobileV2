@@ -11,7 +11,7 @@ import {
   TextInput,
   ScrollView,
 } from "react-native";
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo } from "react";
 import { HelperText, TextInput as Paper } from "react-native-paper";
 import { useFonts as Fuentes } from "expo-font";
 import { createIconSetFromIcoMoon } from "@expo/vector-icons";
@@ -19,19 +19,73 @@ import AppLoading from "expo-app-loading";
 import Toast from "react-native-root-toast";
 import { useNavigation } from "@react-navigation/native";
 import { useFonts, Urbanist_400Regular } from "@expo-google-fonts/urbanist";
-import { getDatabase, child, get, ref, limitToFirst } from "firebase/database";
+import { getDatabase, child, get, ref, limitToFirst, update } from "firebase/database";
 import { Skeleton } from "moti/skeleton";
 import { MotiView } from 'moti';
+import * as Location from 'expo-location';
 
 const StepTwo = (props) => {
+  const database = getDatabase();
   const navigation = useNavigation();
+
+  const [latitud, setLatitud] = useState(null);
+  const [longitud, setLongitud] = useState(null);
+  Location.setGoogleApiKey("AIzaSyCL6SrNElBbvIVhJtW3t_K4cn8OasyznsQ");
 
   function MySkeleton() {
     return(
             <Skeleton width={'100%'} height={45} colorMode={'light'}></Skeleton>
           );
+  }
+
+  const llenarCoordenadas = async() => {
+    let arregloTemporal={
+        latitud:'',
+        longitud:'',
+    };
+    console.log('Estás llenando las coordenadas');
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== 'granted') {
+        console.log('Permission to access location was denied');
+        return;
     }
-  // console.log(props);
+    let location = await Location.getCurrentPositionAsync();
+    arregloTemporal.latitud = location.coords.latitude.toString();
+    arregloTemporal.longitud = location.coords.longitude.toString();
+    let coordenadas = arregloTemporal.latitud + "," + arregloTemporal.longitud;
+    await update(child(ref(database), `folios/correctivos/${props.tipoFolio}/${props.folio}`), {
+        coordenada: coordenadas
+    }).then((snapshot)=>{});
+    setLatitud(arregloTemporal.latitud);
+    setLongitud(arregloTemporal.longitud);
+  };
+
+  useEffect(()=>{
+    if(props.estado == 2){
+      llenarCoordenadas();
+    }
+    return () => {
+
+    }
+  }, []);
+
+  useEffect(()=>{
+    setLatitud(latitud);
+    return () => {
+
+    }
+  },[latitud]);
+
+  useEffect(()=>{
+    setLongitud(longitud);
+    props.callback(
+      latitud, longitud
+    );
+    return () => {
+
+    }
+  },[longitud]);
+
   const Iconos = createIconSetFromIcoMoon(
     require("../../../icons/selection.json"),
     "IcoMoon",
@@ -54,24 +108,27 @@ const StepTwo = (props) => {
         <View style={styles.row}>
           <View style={styles.contenedorInput}>
             <HelperText style={styles.helper}>Latitud</HelperText>
-            <TextInput
-              style={[styles.inputCustomizedInfo, { marginRight: "2%" }]}
-              underlineColor="transparent"
-              outlineColor="transparent"
-              activeOutlineColor="transparent"
-              selectionColor="transparent"
-              autoFocus={false}
-              onChangeText={() => {}}
-              value={props.latitud}
-              editable={false}
-              multiline={true}
-            ></TextInput>
+            {
+                latitud ? 
+                <TextInput
+                  style={[styles.inputCustomizedInfo, { marginRight: "2%" }]}
+                  underlineColor="transparent"
+                  outlineColor="transparent"
+                  activeOutlineColor="transparent"
+                  selectionColor="transparent"
+                  autoFocus={false}
+                  onChangeText={() => {}}
+                  value={latitud}
+                  editable={false}
+                  multiline={true}
+                ></TextInput>
+                : <MySkeleton></MySkeleton>
+            }
           </View>
           <View style={styles.contenedorInput}>
             <HelperText style={styles.helper}>Longitud</HelperText>
-            <MySkeleton>
             {
-                props.latitud ? 
+                longitud ? 
                   <TextInput
                     style={[styles.inputCustomizedInfo, { marginRight: "2%" }]}
                     underlineColor="transparent"
@@ -80,13 +137,12 @@ const StepTwo = (props) => {
                     selectionColor="transparent"
                     autoFocus={false}
                     onChangeText={() => {}}
-                    value={props.longitud}
+                    value={longitud}
                     editable={false}
                     multiline={true}
                   ></TextInput>
-                : null 
+                : <MySkeleton></MySkeleton>
               }
-            </MySkeleton>
           </View>
         </View>
         <View style={styles.row}>

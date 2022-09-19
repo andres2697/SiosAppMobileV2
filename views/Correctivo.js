@@ -23,13 +23,8 @@ import StepThree from "./components/stepsCorrectivo/StepThree";
 import Herramientas from "./components/Herramientas";
 import MaterialesConcepto from "./components/MaterialesConcepto";
 import BotonesStepTwo from "./components/BotonesStepTwo";
+import Coordenadas from "./components/Coordenadas";
 import * as Location from 'expo-location';
-
-// const MySkeleton = () => {
-//     return (
-//         <Skeleton/>
-//     )
-// }
 
 const Correctivo = () => {
   const navigation = useNavigation();
@@ -49,8 +44,8 @@ const Correctivo = () => {
 
   const [infoData, setInfoData] = useState({});  //  Inicialización del objeto de control para almacenamiento de información.
   const [estado, setEstado] = useState(null);
-  const [latitud, setLatitud] = useState('');
-  const [longitud, setLongitud] = useState('');
+//   const [latitud, setLatitud] = useState('');
+//   const [longitud, setLongitud] = useState('');
 
   const [componente, setComponente] = useState(<></>);
 //   const [paso, setPaso] = useState(1);
@@ -101,9 +96,13 @@ const Correctivo = () => {
         // console.log(infoData);
     });
 
-    setEstado(2);
-    setComponente(null);
+    setComponente(
+        <View style={{width: '100%', height:'100%', backgroundColor:'#ffffff', alignContent:"center", alignItems:"center"}}>
+            <ActivityIndicator size="large" color="#2166E5" style={{alignSelf:"center", marginTop:'100%'}}></ActivityIndicator>
+        </View>
+    );
     setInfoData(infoData);
+    setEstado(2);
   };
 
 //--------------------------------------------------------------//
@@ -111,6 +110,7 @@ const Correctivo = () => {
 //  por la aplicación en el paso 3 (hora de llegada y sla).     //
 //--------------------------------------------------------------//
   const startAnimate2 = async(valorNuevo, valorNuevoE, colores) => {
+    setComponente(null);
     setBurbuja1(colores[0]);
     setLinea1(colores[1]);
     setBurbuja2(colores[2]);
@@ -151,9 +151,13 @@ const Correctivo = () => {
     infoData.horaActivacion = activacion.hora;
     infoData.fechaActivacion = activacion.fechaScript;
     // infoData.estado = 3;
-    setEstado(3);
+    setComponente(
+        <View style={{width: '100%', height:'100%', backgroundColor:'#ffffff', alignContent:"center", alignItems:"center"}}>
+            <ActivityIndicator size="large" color="#2166E5" style={{alignSelf:"center", marginTop:'100%'}}></ActivityIndicator>
+        </View>
+    );
     setInfoData(infoData);
-    console.log('Entrando al paso 3')
+    setEstado(3);
   };
     //----------------------------------------------
 //  Funciones para los calculos de SLA 
@@ -220,6 +224,13 @@ const Correctivo = () => {
   };
 
 //----------------------------------------------
+
+const llenarCoordenadas = (latitud, longitud) =>{
+    infoData.latitud = latitud;
+    infoData.longitud = longitud;
+    setInfoData(infoData);
+    console.log(infoData);
+}
 
 //--------------------------------------------------------------//
 //  Función encargada de almacenar en el objeto 'infoData' la   //
@@ -375,10 +386,8 @@ const Correctivo = () => {
         break;
         case 2: 
             console.log('Paso 2');
-            llenarCoordenadas();
             setComponente(
                 <>
-                    <Text>{infoData.longitud}</Text>
                     <InfoExtra
                         style={{ height: "auto" }}
                         folio={infoData.folio}
@@ -404,10 +413,12 @@ const Correctivo = () => {
                         ></Tiempos>
                         <View style={{alignContent: "center", width:'100%', alignItems:"center"}}>
                             <StepTwo
-                            latitud={latitud}
-                            longitud={longitud}
-                            eta={infoData.eta}
-                            sla={infoData.sla}
+                                folio={infoData.folio}
+                                tipoFolio={infoData.tipoFolio}
+                                eta={infoData.eta}
+                                sla={infoData.sla}
+                                estado={estado}
+                                callback={llenarCoordenadas.bind(this)}
                             ></StepTwo>
                         </View>
                         <Herramientas folio={infoData.folio} tipoFolio={infoData.tipoFolio}></Herramientas>
@@ -423,6 +434,7 @@ const Correctivo = () => {
             break;
         case 3: 
             console.log('Paso 3');
+            console.log(estado);
             setComponente(
                 <>
                     <InfoExtra
@@ -442,19 +454,24 @@ const Correctivo = () => {
                     line1={linea1}
                     line2={linea2}
                     ></Timeline>
-                    <StepTwo
-                        latitud={infoData.latitud}
-                        longitud={infoData.longitud}
-                        eta={infoData.eta}
-                        sla={infoData.sla}
-                    ></StepTwo>
+                    <View style={{alignContent: "center", width:'100%', alignItems:"center"}}>
+                            <Coordenadas
+                                latitud={infoData.latitud}
+                                longitud={infoData.longitud}
+                                eta={infoData.eta}
+                                sla={infoData.sla}
+                            ></Coordenadas>
+                        </View>
                     <View>
                         <Tiempos
                         data="Hora de cierre"
                         fecha={infoData.fechaActivacion}
                         hora={infoData.horaActivacion}
                         ></Tiempos>
-                        <StepThree></StepThree>
+                        <StepThree
+                            folio={infoData.folio}
+                            tipoFolio={infoData.tipoFolio}
+                        ></StepThree>
                     </View>
                 </>
             );
@@ -463,44 +480,6 @@ const Correctivo = () => {
     return () => {
     };
   }, [estado]);
-
-  const llenarCoordenadas = async() => {
-    let arregloTemporal={
-        latitud:'',
-        longitud:'',
-    };
-    console.log('Estás llenando las coordenadas');
-    let { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== 'granted') {
-        console.log('Permission to access location was denied');
-        return;
-    }
-    let location = await Location.getCurrentPositionAsync();
-    arregloTemporal.latitud = location.coords.latitude.toString();
-    arregloTemporal.longitud = location.coords.longitude.toString();
-    // arregloTemporal.latitud = '77.5555';
-    // arregloTemporal.longitud = ',45.3434';
-    let coordenadas = arregloTemporal.latitud + "," + arregloTemporal.longitud;
-    await update(child(ref(database), `folios/correctivos/${infoData.tipoFolio}/${infoData.folio}`), {
-        coordenada: coordenadas
-    }).then((snapshot)=>{});
-    
-    // setInfoData(arregloTemporal);
-    // console.log(infoData);
-    setLatitud(arregloTemporal.latitud);
-    setLatitud(arregloTemporal.longitud);
-  };
-  useEffect(() => {
-    return () => {
-
-    }
-  }, [latitud]);
-
-  useEffect(() => {
-    return () => {
-
-    }
-  }, [longitud]);
 
   useEffect(() => {
     return () => {
@@ -561,7 +540,6 @@ const styles = StyleSheet.create({
   contenedorPrincipal: {
     width: "100%",
     height: "100%",
-    // fontFamily: 'Urbanist_400Regular',
     backgroundColor: "white",
     flex: 8,
   },
