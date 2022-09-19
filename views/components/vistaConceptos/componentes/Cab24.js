@@ -22,6 +22,7 @@ import * as Location from 'expo-location';
 
 const Cab24 = (props) => {
   const folio = props.folio;
+  const tipoFolio = props.tipoFolio;
   const [coordenadas, setCoordenadas] = useState(new Array());
   const [cantidad, setCantidad] = useState(0);
   const [habilitado, setHabilitado] = useState(false);
@@ -40,7 +41,7 @@ const Cab24 = (props) => {
       set(
         child(
         ref(db),
-        `foliosAsignados/${auth.currentUser.uid}/correctivo/activo/${folio}/conceptosUsados/CAB-024/${id}`
+        `folios/correctivos/${tipoFolio}/${folio}/conceptosUsados/CAB-024/${id}`
         ),
         null
       );
@@ -57,7 +58,7 @@ const Cab24 = (props) => {
     let location = await Location.getCurrentPositionAsync();
     let coordenada = location.coords.latitude.toString() + "," + location.coords.longitude.toString();
     
-    const postListRef = ref(db, `foliosAsignados/${auth.currentUser.uid}/correctivo/activo/${folio}/conceptosUsados/CAB-024`);
+    const postListRef = ref(db, `folios/correctivos/${tipoFolio}/${folio}/conceptosUsados/CAB-024`);
     const newPostRef = push(postListRef);
     set(newPostRef, {
       coordenada
@@ -81,7 +82,7 @@ const Cab24 = (props) => {
     let consulta1 = await get(
       child(
         ref(db),
-        `foliosAsignados/${auth.currentUser.uid}/correctivo/activo/${folio}/conceptosUsados/CAB-024`
+        `folios/correctivos/${tipoFolio}/${folio}/conceptosUsados/CAB-024`
       )
     )
       .then((snapshot) => {
@@ -216,7 +217,7 @@ const Cab24 = (props) => {
                       set(
                         child(
                         ref(db),
-                        `foliosAsignados/${auth.currentUser.uid}/correctivo/activo/${folio}/conceptosUsados/CAB-024/${item.keyCoordenadas}/coordenada`
+                        `folios/correctivos/${tipoFolio}/${folio}/conceptosUsados/CAB-024/${item.keyCoordenadas}/coordenada`
                         ),
                         coordenada
                       );

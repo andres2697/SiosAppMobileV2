@@ -19,7 +19,7 @@ import AppLoading from "expo-app-loading";
 import Toast from "react-native-root-toast";
 import { useNavigation } from "@react-navigation/native";
 import { useFonts, Urbanist_400Regular } from "@expo-google-fonts/urbanist";
-import { getDatabase, child, get, ref, serverTimestamp, set } from 'firebase/database';
+import { getDatabase, child, get, ref, serverTimestamp, set, update } from 'firebase/database';
 import moment, { min } from 'moment'
 
 import { getAuth } from 'firebase/auth';
@@ -29,6 +29,7 @@ const StepOne = (props) => {
   const db = getDatabase();
   const auth = getAuth();
   const folio = props.folio;
+  const tipoFolio = props.tipoFolio;
   // console.log(db.);
   // var timerInicio = new Date();
   // const [dia, setDia] = useState(timerInicio.getDate());
@@ -79,16 +80,20 @@ const StepOne = (props) => {
             let hora = new Date().getHours(serverTimestamp());
             let minuto = new Date().getMinutes(serverTimestamp());
 
-            let fecha = (dia < 10 ?  '0' + dia.toString() : dia.toString()) + '/' + (mes < 10 ?  '0' + mes.toString() : mes.toString()) + '/' + anio.toString();
+            let fechaScript = (dia < 10 ?  '0' + dia.toString() : dia.toString()) + '/' + (mes < 10 ?  '0' + mes.toString() : mes.toString()) + '/' + anio.toString();
+            let fechaSistema = anio.toString() + '/' + (mes < 10 ?  '0' + mes.toString() : mes.toString()) + '/' + (dia < 10 ?  '0' + dia.toString() : dia.toString());
             let horario = (hora < 10 ?  '0' + hora.toString() : hora.toString()) + ':' + (minuto < 10 ?  '0' + minuto.toString() : minuto.toString());
 
-            set(child(ref(db), `foliosAsignados/${auth.currentUser.uid}/correctivo/activo/${folio}/estado`), 2);
-
-            set(child(ref(db), `foliosAsignados/${auth.currentUser.uid}/correctivo/activo/${folio}/horaLlegada`), {
-              fecha: fecha,
-              hora: horario
+            update(child(ref(db), `folios/correctivos/${tipoFolio}/${folio}`), {
+              estado: 2, 
+              horaLlegada: {
+                fechaScript: fechaScript,
+                fechaSistema: fechaSistema,
+                hora: horario
+              },
+              estatus: 2 
             });
-
+            
             props.callback(
                 -50, 0, 
                 ["#2166E5", "#2166E5","#2166E5", "#EDF2F9", "black"], 
@@ -97,7 +102,9 @@ const StepOne = (props) => {
                   anio.toString(), 
                   hora < 10 ?  '0' + hora.toString() : hora.toString(), 
                   minuto < 10 ?  '0' + minuto.toString() : minuto.toString()
-                ]
+                ],
+                fechaSistema,
+                hora
               );
           }}
         >

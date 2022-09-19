@@ -27,6 +27,7 @@ const Herramientas = (props) => {
   const db = getDatabase();
   const auth = getAuth();
   const folio = props.folio;
+  const tipoFolio = props.tipoFolio;
 
   const navigation = useNavigation();
   const [potenciaInicial, setPotenciaInicial] = useState("");
@@ -42,7 +43,7 @@ const Herramientas = (props) => {
     const variable1 = await get(
       child(
         ref(db),
-        `foliosAsignados/${auth.currentUser.uid}/correctivo/activo/${folio}/potencias`,
+        `folios/correctivos/${tipoFolio}/${folio}/potencias`,
         limitToFirst(1)
       )
     )
@@ -67,13 +68,13 @@ const Herramientas = (props) => {
     const variables = await get(
       child(
         ref(db),
-        `foliosAsignados/${auth.currentUser.uid}/correctivo/activo/${folio}/potenciaInicial`,
+        `folios/correctivos/${tipoFolio}/${folio}/potencias/potenciaInicial`,
         limitToFirst(1)
       )
     )
       .then((snapshot) => {
         if (snapshot.exists()) {
-          console.log(snapshot.val());
+          // console.log(snapshot.val());
           setPotenciaInicial(snapshot.val());
           setPotenciaInicialTemp(snapshot.val());
         }
@@ -118,7 +119,7 @@ const Herramientas = (props) => {
     set(
       child(
         ref(db),
-        `foliosAsignados/${auth.currentUser.uid}/correctivo/activo/${folio}/potencias/horaMedicion`
+        `folios/correctivos/${tipoFolio}/${folio}/potencias/horaMedicion`
       ),
       escribirHorario
     );
@@ -190,7 +191,7 @@ const Herramientas = (props) => {
                   set(
                     child(
                       ref(db),
-                      `foliosAsignados/${auth.currentUser.uid}/correctivo/activo/${folio}/potencias/potenciaInicial`
+                      `folios/correctivos/${tipoFolio}/${folio}/potencias/potenciaInicial`
                     ),
                     potenciaInicial
                   );
@@ -203,7 +204,7 @@ const Herramientas = (props) => {
                     set(
                       child(
                         ref(db),
-                        `foliosAsignados/${auth.currentUser.uid}/correctivo/activo/${folio}/potencias/potenciaInicial`
+                        `folios/correctivos/${tipoFolio}/${folio}/potencias/potenciaInicial`
                       ),
                       potenciaInicial
                     );
@@ -211,7 +212,7 @@ const Herramientas = (props) => {
                     set(
                       child(
                         ref(db),
-                        `foliosAsignados/${auth.currentUser.uid}/correctivo/activo/${folio}/potencias/potenciaInicial`
+                        `folios/correctivos/${tipoFolio}/${folio}/potencias/potenciaInicial`
                       ),
                       null
                     );
@@ -246,7 +247,7 @@ const Herramientas = (props) => {
                   set(
                     child(
                       ref(db),
-                      `foliosAsignados/${auth.currentUser.uid}/correctivo/activo/${folio}/potencias/potenciaFinal`
+                      `folios/correctivos/${tipoFolio}/${folio}/potencias/potenciaFinal`
                     ),
                     potenciaFinal
                   );
@@ -259,7 +260,7 @@ const Herramientas = (props) => {
                     set(
                       child(
                         ref(db),
-                        `foliosAsignados/${auth.currentUser.uid}/correctivo/activo/${folio}/potencias/potenciaFinal`
+                        `folios/correctivos/${tipoFolio}/${folio}/potencias/potenciaFinal`
                       ),
                       potenciaFinal
                     );
@@ -267,7 +268,7 @@ const Herramientas = (props) => {
                     set(
                       child(
                         ref(db),
-                        `foliosAsignados/${auth.currentUser.uid}/correctivo/activo/${folio}/potencias/potenciaFinal`
+                        `folios/correctivos/${tipoFolio}/${folio}/potencias/potenciaFinal`
                       ),
                       null
                     );
@@ -337,7 +338,7 @@ const Herramientas = (props) => {
               set(
                 child(
                   ref(db),
-                  `foliosAsignados/${auth.currentUser.uid}/correctivo/activo/${folio}/potencias/horaMedicion`
+                  `folios/correctivos/${tipoFolio}/${folio}/potencias/horaMedicion`
                 ),
                 null
               );

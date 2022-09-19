@@ -29,7 +29,7 @@ import {
     const [animation, setAnimation] = useState(new Animated.Value(0));
     const [animationO, setAnimationE] = useState(new Animated.Value(0));
 
-    console.log(props);
+    // console.log(props);
 
     startAnimateInfo = (valorNuevo, valorNuevoE) => {
         Animated.parallel([

@@ -18,8 +18,10 @@ import {
 } from "firebase/database";
 
 const Miscelaneos = (props) => {
+  // console.log(props.route.params.tipoFolio);
   const folio = props.route.params.folio;
   const lista = props.route.params.lista;
+  const tipoFolio = props.route.params.tipoFolio;
   const [materiales, setMateriales] = useState(new Array());
   const [index, setIndex] = useState(0);
   const db = getDatabase();
@@ -27,7 +29,7 @@ const Miscelaneos = (props) => {
 
   const cargarMateriales = useCallback(async()=>{
       let x = 0;
-      const variables = await get(child(ref(db), `foliosAsignados/${auth.currentUser.uid}/correctivo/activo/${folio}/materialesUsados/miscelaneos`))
+      const variables = await get(child(ref(db), `folios/correctivos/${tipoFolio}/${folio}/materialesUsados/miscelaneos`))
           .then((snapshot) => {
             // console.log(index);
             snapshot.forEach((element) => {
@@ -67,7 +69,14 @@ const Miscelaneos = (props) => {
 
   return (
     <View style={styles.contenedorPrincipal}>
-        <ListaMateriales folio={folio} tipoMaterial={1} lista={lista} materiales={materiales} tamanio={index}></ListaMateriales>
+        <ListaMateriales 
+          folio={folio} 
+          tipoMaterial={1} 
+          lista={lista} 
+          materiales={materiales} 
+          tamanio={index} 
+          tipoFolio={tipoFolio}
+        ></ListaMateriales>
     </View>
   );
 };

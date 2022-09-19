@@ -4,13 +4,6 @@ import {
   View,
   TouchableOpacity,
   Text,
-  ActivityIndicator,
-  ToastAndroid,
-  TouchableWithoutFeedback,
-  Animated,
-  TextInput,
-  ScrollView,
-  
 } from "react-native";
 import { useState, useEffect } from "react";
 import { HelperText, TextInput as Paper, Button } from "react-native-paper";
@@ -37,6 +30,7 @@ const BotonesStepTwo = (props) => {
   const db = getDatabase();
   const auth = getAuth();
   const folio = props.folio;
+  const tipoFolio = props.tipoFolio;
 
   const Iconos = createIconSetFromIcoMoon(
     require("../../icons/selection.json"),
@@ -66,6 +60,7 @@ const BotonesStepTwo = (props) => {
             onPress={() => {
               navigation.navigate("Observaciones", {
                 folio: folio,
+                tipoFolio: tipoFolio,
               });
             }}
           >
@@ -93,8 +88,8 @@ const BotonesStepTwo = (props) => {
               let fecha = (dia < 10 ?  '0' + dia.toString() : dia.toString()) + '/' + (mes < 10 ?  '0' + mes.toString() : mes.toString()) + '/' + anio.toString();
               let horario = (hora < 10 ?  '0' + hora.toString() : hora.toString()) + ':' + (minuto < 10 ?  '0' + minuto.toString() : minuto.toString());
               
-              set(child(ref(db), `foliosAsignados/${auth.currentUser.uid}/correctivo/activo/${folio}/estado`), 3);
-              set(child(ref(db), `foliosAsignados/${auth.currentUser.uid}/correctivo/activo/${folio}/horaActivacion`), {
+              set(child(ref(db), `folios/correctivos/${tipoFolio}/${folio}/estado`), 3);
+              set(child(ref(db), `folios/correctivos/${tipoFolio}/${folio}/horaActivacion`), {
                 fecha: fecha,
                 hora: horario
               });

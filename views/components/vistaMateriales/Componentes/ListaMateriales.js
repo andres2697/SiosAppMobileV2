@@ -27,6 +27,7 @@ import {
   
   const ListaMateriales = (props) => {
     const folio = props.folio;
+    const tipoFolio = props.tipoFolio;
     const tipoMaterial = props.tipoMaterial;
     const [lista, setLista] = useState(props.lista);
     const [cantidad, setCantidad] = useState("1");
@@ -52,7 +53,7 @@ import {
         set(
           child(
           ref(db),
-          `foliosAsignados/${auth.currentUser.uid}/correctivo/activo/${folio}/materialesUsados/miscelaneos/${titulo}`
+          `folios/correctivos/${tipoFolio}/${folio}/materialesUsados/miscelaneos/${titulo}`
           ),
           null
         );
@@ -62,7 +63,7 @@ import {
         set(
           child(
           ref(db),
-          `foliosAsignados/${auth.currentUser.uid}/correctivo/activo/${folio}/materialesUsados/TP/${titulo}`
+          `folios/correctivos/${tipoFolio}/${folio}/materialesUsados/TP/${titulo}`
           ),
           null
         );
@@ -163,6 +164,7 @@ import {
           <View style={{ width: '100%', justifyContent: "center", alignItems: "center", paddingBottom: 30, paddingTop: 30 }}>
                 <EntradaMateriales 
                   folio={folio} 
+                  tipoFolio={tipoFolio}
                   tipoMaterial={tipoMaterial}
                   lista={lista}
                   // callback={detectarCambio.bind(this)}
@@ -206,7 +208,7 @@ import {
                             set(
                                 child(
                                 ref(db),
-                                `foliosAsignados/${auth.currentUser.uid}/correctivo/activo/${folio}/materialesUsados/miscelaneos/${valorMat}`
+                                `folios/correctivos/${tipoFolio}/${folio}/materialesUsados/miscelaneos/${valorMat}`
                                 ),
                                 Number(cantidadMat)
                             );
@@ -237,7 +239,7 @@ import {
                               set(
                                   child(
                                   ref(db),
-                                  `foliosAsignados/${auth.currentUser.uid}/correctivo/activo/${folio}/materialesUsados/TP/${valorMat}`
+                                  `folios/correctivos/${tipoFolio}/${folio}/materialesUsados/TP/${valorMat}`
                                   ),
                                   Number(cantidadMat)
                               );

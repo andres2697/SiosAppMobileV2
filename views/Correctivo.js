@@ -1,26 +1,18 @@
 import {
   StyleSheet,
   View,
-  TouchableOpacity,
-  Text,
   ActivityIndicator,
-  ToastAndroid,
-  Animated,
-  // ScrollView,
+  Text
 } from "react-native";
 import React, { Suspense } from "react";
 import { ScrollView } from "react-native-virtualized-view";
-import { useState, useEffect, useCallback } from "react";
-import { Button, HelperText, TextInput as Paper } from "react-native-paper";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useFonts as Fuentes } from "expo-font";
 import { createIconSetFromIcoMoon } from "@expo/vector-icons";
 import AppLoading from "expo-app-loading";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import Toast from "react-native-root-toast";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import Cabecera from "./components/Cabecera";
 import { useFonts, Urbanist_400Regular } from "@expo-google-fonts/urbanist";
-import { getDatabase, child, get, ref, limitToFirst } from "firebase/database";
+import { getDatabase, child, get, ref, limitToFirst, set, update, serverTimestamp } from "firebase/database";
 import { getAuth } from "firebase/auth";
 import InfoExtra from "./components/InfoExtra";
 import Timeline from "./components/TimeLine";
@@ -31,34 +23,37 @@ import StepThree from "./components/stepsCorrectivo/StepThree";
 import Herramientas from "./components/Herramientas";
 import MaterialesConcepto from "./components/MaterialesConcepto";
 import BotonesStepTwo from "./components/BotonesStepTwo";
+import * as Location from 'expo-location';
+
+// const MySkeleton = () => {
+//     return (
+//         <Skeleton/>
+//     )
+// }
 
 const Correctivo = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const [cargado, setCargado] = useState(false);
-  // const navegacion = route.params.navigation;
-
-  const [animation, setAnimation] = useState(new Animated.Value(0));
-  const [animationO, setAnimationE] = useState(new Animated.Value(1));
-  const [animation2, setAnimation2] = useState(new Animated.Value(50));
-  const [animationO2, setAnimationE2] = useState(new Animated.Value(0));
-  const [animation3, setAnimation3] = useState(new Animated.Value(50));
-  const [animationO3, setAnimationE3] = useState(new Animated.Value(0));
+  const mounted = useRef(false);
+  Location.setGoogleApiKey("AIzaSyCL6SrNElBbvIVhJtW3t_K4cn8OasyznsQ");
+//   const [animation, setAnimation] = useState(new Animated.Value(0));
+//   const [animationO, setAnimationE] = useState(new Animated.Value(1));
+//   const [animation2, setAnimation2] = useState(new Animated.Value(50));
+//   const [animationO2, setAnimationE2] = useState(new Animated.Value(0));
+//   const [animation3, setAnimation3] = useState(new Animated.Value(50));
+//   const [animationO3, setAnimationE3] = useState(new Animated.Value(0));
 
   const database = getDatabase();
   const auth = getAuth();
 
-  const [folio, setFolio] = useState("");
-  const [estado, setEstado] = useState(0);
-  const [tipoFolio, setTipoFolio] = useState("");
-  const [distrito, setDistrito] = useState("");
-  const [cluster, setCluster] = useState("");
-  const [falla, setFalla] = useState("");
-  const [causa, setCausa] = useState("");
-  const [clientesAfectados, setClientesAfectados] = useState(0);
-  const [fechaInicio, setFechaInicio] = useState("");
-  const [horaInicio, setHoraInicio] = useState("");
-  const [paso, setPaso] = useState(1);
+  const [infoData, setInfoData] = useState({});  //  Inicialización del objeto de control para almacenamiento de información.
+  const [estado, setEstado] = useState(null);
+  const [latitud, setLatitud] = useState('');
+  const [longitud, setLongitud] = useState('');
+
+  const [componente, setComponente] = useState(<></>);
+//   const [paso, setPaso] = useState(1);
   const [altura, setAltura] = useState("100%");
   const [altura2, setAltura2] = useState(0);
   const [altura3, setAltura3] = useState(0);
@@ -70,215 +65,449 @@ const Correctivo = () => {
 
   const [tituloPagina, setTituloPagina] = useState("");
 
-  const cargarInfoFolio = useCallback(async () => {
-    let folioKey;
-    let tipoFolio; 
-    const folio = await get(child(ref(database), 
-            `foliosAsignados/correctivos/activo/${auth.currentUser.uid}`
-        ))
-        .then((snapshot)=>{
-            // console.log(snapshot.val());
-            snapshot.forEach((folio)=>{
-                // console.log(folio.key);
-                tipoFolio = folio.key;
-                folioKey = Object.keys(folio.val())[0];
-            })
+//-----------------------------------------------------------------------------//
+//  Función de retorno para actualización de datos calculados                  //
+//  por la aplicación en el paso 2 (hora de llegada, eta, latitud y longitud). //
+//-----------------------------------------------------------------------------//
+  const startAnimate = async(valorNuevo, valorNuevoE, colores, tiempo, fechaSistemaInicio, horaSistemaInicio) => {
+
+    setBurbuja1(colores[0]);
+    setLinea1(colores[1]);
+    setBurbuja2(colores[2]);
+    setLinea2(colores[3]);
+    setBurbuja3(colores[4]);
+    infoData.fechaLlegada = tiempo[0] + "/" + tiempo[1] + "/" + tiempo[2];
+    infoData.horaLlegada = tiempo[3] + ":" + tiempo[4];
+    infoData.latitud = '';
+    infoData.longitud = '';
+
+    let inicio = new Date(fechaSistemaInicio + " " + horaSistemaInicio + ":00");
+    let llegada = new Date(tiempo[2] + "/" + tiempo[1] + "/" + tiempo[0] + " " + infoData.horaLlegada + ":00");
+
+    let diferencia = llegada.getTime() - inicio.getTime();
+    let minutos = 0;
+
+    while (diferencia >= 60000) {
+        minutos = minutos + 1;
+        diferencia = diferencia - 60000;
+    }
+    infoData.eta.tiempo = '00:' + (minutos < 10 ? "0" + minutos.toString() : minutos.toString());
+    infoData.eta.color = minutos > 30 ? 'red' : 'transparent';
+    
+    await update(child(ref(database), `folios/correctivos/${infoData.tipoFolio}/${infoData.folio}`), {
+        eta: infoData.eta.tiempo
+    }).then((snapshot)=>{
+
+        // console.log(infoData);
     });
-    console.log(folioKey);
-    console.log(tipoFolio);
-    const variables = await get(
-      child(
-        ref(database),
-        `folios/correctivos/${tipoFolio}/${folioKey}`,
-        limitToFirst(1)
-      )
-    )
+
+    setEstado(2);
+    setComponente(null);
+    setInfoData(infoData);
+  };
+
+//--------------------------------------------------------------//
+//  Función de retorno para actualización de datos calculados   //
+//  por la aplicación en el paso 3 (hora de llegada y sla).     //
+//--------------------------------------------------------------//
+  const startAnimate2 = async(valorNuevo, valorNuevoE, colores) => {
+    setBurbuja1(colores[0]);
+    setLinea1(colores[1]);
+    setBurbuja2(colores[2]);
+    setLinea2(colores[3]);
+    setBurbuja3(colores[4]);
+
+    let activacion = {};
+    let inicio = {};
+    let tolerancia = 0;
+    activacion = await obtenerHoraActivacion();
+    inicio = await obtenerHoraInicio();
+    tolerancia = await obtenerTolerancia();
+    let diferencia = (activacion.newDate.getTime()) - inicio.newDate.getTime();
+    let horas = 0;
+    let minutos = 0;
+    while (diferencia >= 60000) {
+      if (diferencia >= 3600000) {
+        horas = horas + 1;
+        diferencia = diferencia - 3600000;
+      } else {
+        minutos = minutos + 1;
+        diferencia = diferencia - 60000;
+      }
+    }
+    infoData.sla.tiempo =
+      (horas < 10 ? "0" + horas.toString() : horas.toString()) +
+      ":" +
+      (minutos < 10 ? "0" + minutos.toString() : minutos.toString());
+    /** MODIFICAR LA FORMA DE OBTENCION DEL COLOR DEL BORDE EN calculo.color  **/
+    infoData.sla.color = ( horas > 0 || minutos > tolerancia ) ? 'red' : '';
+    await update(child(ref(database), `folios/correctivos/${infoData.tipoFolio}/${infoData.folio}`), {
+        sla: infoData.sla.tiempo,
+        estado: 3,
+        estatus: 3,
+    }).then((snapshot)=>{
+
+    });
+    infoData.horaActivacion = activacion.hora;
+    infoData.fechaActivacion = activacion.fechaScript;
+    // infoData.estado = 3;
+    setEstado(3);
+    setInfoData(infoData);
+    console.log('Entrando al paso 3')
+  };
+    //----------------------------------------------
+//  Funciones para los calculos de SLA 
+//----------------------------------------------
+  const obtenerHoraInicio = async() => {
+        let fInicio = {};
+        await get(child(ref(database), `folios/correctivos/${infoData.tipoFolio}/${infoData.folio}/horaInicio`))
+          .then((snapshot) => {
+            snapshot.forEach((inicio) => {
+              if (inicio.key == "fechaSistema") {
+                fInicio.fecha = inicio.exportVal();
+              } else if (inicio.key == "hora") {
+                fInicio.hora = inicio.exportVal();
+              }
+            });
+          })
+          .catch(function (err) {});
+        fInicio.newDate = new Date(fInicio.fecha + " " + fInicio.hora + ":00");
+        // console.log(fInicio);
+        return fInicio;
+  };
+
+  const obtenerHoraActivacion = async() => {
+    let hora_cierre = {};
+    let dia = new Date().getDate(serverTimestamp());
+    let mes = new Date().getMonth(serverTimestamp()) + 1;
+    let anio = new Date().getFullYear(serverTimestamp());
+            
+    let hora = new Date().getHours(serverTimestamp());
+    let minuto = new Date().getMinutes(serverTimestamp());
+
+    let fechaScript = (dia < 10 ?  '0' + dia.toString() : dia.toString()) + '/' + (mes < 10 ?  '0' + mes.toString() : mes.toString()) + '/' + anio.toString();
+    let fechaSistema = anio.toString() + '/' + (mes < 10 ?  '0' + mes.toString() : mes.toString()) + '/' + (dia < 10 ?  '0' + dia.toString() : dia.toString());
+    let horario = (hora < 10 ?  '0' + hora.toString() : hora.toString()) + ':' + (minuto < 10 ?  '0' + minuto.toString() : minuto.toString());
+
+    update(child(ref(database), `folios/correctivos/${infoData.tipoFolio}/${infoData.folio}`), {
+      estado: 3, 
+      horaActivacion: {
+        fechaScript: fechaScript,
+        fechaSistema: fechaSistema,
+        hora: horario
+      },
+      estatus: 3 
+    });
+    hora_cierre.fechaScript = fechaScript;
+    hora_cierre.hora = horario;
+    // setInfoData(infoData);
+    hora_cierre.newDate = new Date(fechaSistema + " " + horario + ":00");
+    return hora_cierre;
+  };
+
+  const obtenerTolerancia = async () => {
+    let tiempoTolerancia = 0;
+    await get(child(ref(database), `catalogo/tipoFolios/correctivo` + `/${infoData.tipoFolio}`))
       .then((snapshot) => {
-        // console.log(snapshot);
-        snapshot.forEach((element) => {
-          setFolio(element.key);
-          setTipoFolio(tipoFolio);
-          setDistrito(element.val()["distrito"]);
-          setCluster(element.val()["cluster"]);
-          setFalla(element.val()["falla"]);
-          setCausa(element.val()["causa"]);
-          setClientesAfectados(element.val()["clientesAfectados"]);
-          // setFechaInicio(element.val()['horaInicio']['fecha']);
-          // setHoraInicio(element.val()['horaInicio']['hora']);
-          setEstado(element.val()["estado"]);
-          setTituloPagina("Folio correctivo");
-          // console.log(estado);
-          if (element.val()["estado"] == 1) {
-            // console.log(element.val()['horaLlegada']['fecha']);
-            setFechaInicio(element.val()["horaInicio"]["fecha"]);
-            setHoraInicio(element.val()["horaInicio"]["hora"]);
-          } else if (element.val()["estado"] == 2) {
-            setFechaInicio(element.val()["horaLlegada"]["fecha"]);
-            setHoraInicio(element.val()["horaLlegada"]["hora"]);
-            setBurbuja1("#2166E5");
-            setLinea1("#2166E5");
-            setBurbuja2("#2166E5");
-            setLinea2("#EDF2F9");
-            setBurbuja3("black");
-            setAltura(0);
-            setAltura3(0);
-            Animated.parallel([
-              Animated.timing(animation, {
-                toValue: -50,
-                duration: 0,
-                // delay: 600,
-                useNativeDriver: false,
-              }),
-              Animated.timing(animationO, {
-                toValue: 0,
-                duration: 0,
-                // delay: 600,
-                useNativeDriver: false,
-              }),
-              Animated.timing(animation2, {
-                toValue: 0,
-                duration: 0,
-                // delay: 600,
-                useNativeDriver: false,
-              }),
-              Animated.timing(animationO2, {
-                toValue: 1,
-                duration: 0,
-                // delay: 600,
-                useNativeDriver: false,
-              }),
-            ]).start();
-            setAltura2("100%");
-          } else if (element.val()["estado"] == 3) {
-            setFechaInicio(element.val()["horaActivacion"]["fecha"]);
-            setHoraInicio(element.val()["horaActivacion"]["hora"]);
-            setBurbuja1("#2166E5");
-            setLinea1("#2166E5");
-            setBurbuja2("#2166E5");
-            setLinea2("#EDF2F9");
-            setBurbuja3("black");
-            setAltura(0);
-            setAltura2(0);
-            Animated.parallel([
-              Animated.timing(animation, {
-                toValue: -50,
-                duration: 0,
-                // delay: 600,
-                useNativeDriver: false,
-              }),
-              Animated.timing(animationO, {
-                toValue: 0,
-                duration: 0,
-                // delay: 600,
-                useNativeDriver: false,
-              }),
-              Animated.timing(animation2, {
-                toValue: -50,
-                duration: 0,
-                // delay: 600,
-                useNativeDriver: false,
-              }),
-              Animated.timing(animationO2, {
-                toValue: 0,
-                duration: 0,
-                // delay: 600,
-                useNativeDriver: false,
-              }),
-              Animated.timing(animation3, {
-                toValue: 0,
-                duration: 0,
-                // delay: 600,
-                useNativeDriver: false,
-              }),
-              Animated.timing(animationO3, {
-                toValue: 1,
-                duration: 0,
-                // delay: 600,
-                useNativeDriver: false,
-              }),
-            ]).start();
-            setAltura3("100%");
-          }
+        snapshot.forEach((tiempoFolio) => {
+          tiempoTolerancia = tiempoFolio.exportVal();
+          // console.log(tiempoFolio.val());
         });
       })
-      .catch(function (err) {
-        console.log(err);
-      });
-  });
+      .catch(function (err) {});
+    // console.log(tiempoTolerancia);
+    return tiempoTolerancia;
+  };
 
+//----------------------------------------------
+
+//--------------------------------------------------------------//
+//  Función encargada de almacenar en el objeto 'infoData' la   //
+//  información del folio desde la base de datos.               //
+//--------------------------------------------------------------//  
+  const cargarInfo = () => {
+    // console.log('Entraste a la función');
+    infoData.eta = {
+        tiempo: '--:--',
+        color: 'transparent'
+    };
+    infoData.sla = {
+        tiempo: '--:--',
+        color: 'transparent'
+
+    };
+    let ruta;
+    get(child(ref(database), 
+        `foliosAsignados/correctivos/activo/${auth.currentUser.uid}`
+    ))
+    .then(async(snapshot)=>{
+        let llave;
+        let tipoFolioLlave;
+        snapshot.forEach((folioActivo)=>{
+            llave =  Object.keys(folioActivo.val())[0];
+            tipoFolioLlave = folioActivo.key;
+        });
+        infoData.folio = llave;
+        infoData.tipoFolio = tipoFolioLlave;
+        // setInfoData(infoData);
+        // console.log(snapshot);
+        ruta = `folios/correctivos/${infoData.tipoFolio}/${infoData.folio}`;
+        await get(
+            child(
+            ref(database),
+            ruta
+            )
+        )
+        .then((snapshot) => {
+        snapshot.forEach((element) => {
+            switch(element.key){
+                case 'distrito':   
+                    infoData.distrito = element.val();
+                break;
+                case 'cluster': 
+                    infoData.cluster = element.val();
+                break;
+                case 'falla': 
+                    infoData.falla = element.val();
+                break;
+                case 'causa': 
+                    infoData.causa = element.val();
+                break;
+                case 'clientesAfectados': 
+                    infoData.clientesAfectados = element.val();
+                break;
+                case 'estado': 
+                    // setEstado(element.val());
+                    if (element.val() == 2) {
+                        setBurbuja1("#2166E5");
+                        setLinea1("#2166E5");
+                        setBurbuja2("#2166E5");
+                        setLinea2("#EDF2F9");
+                        setBurbuja3("black");
+                    } else if (element.val() == 3) {
+                        setBurbuja1("#2166E5");
+                        setLinea1("#2166E5");
+                        setBurbuja2("#2166E5");
+                        setLinea2("#EDF2F9");
+                        setBurbuja3("black");
+                    }
+                break;
+                case 'horaInicio':
+                    infoData.fechaInicio = element.val()["fechaScript"];
+                    infoData.horaInicio = element.val()["hora"];
+                break;
+            }
+            setTituloPagina("Folio correctivo");
+            // setInfoData(infoData);
+        });
+        })
+        .catch(function (err) {
+            console.log(err);
+        });
+        setInfoData(infoData);
+        setEstado(1);
+        // setMostrarPasoUno(true);
+    });
+    return()=>{     
+    }
+  };
+//-----------------------------------------------------------//
+//  Hook encargado de llamar a la función de carga de 
+//  información desde base de datos //
+//-----------------------------------------------------------//
   useEffect(() => {
-    cargarInfoFolio();
+    cargarInfo();
+    return()=>{     
+    }
   }, []);
 
-  const startAnimate = (valorNuevo, valorNuevoE, colores, tiempo) => {
-    setBurbuja1(colores[0]);
-    setLinea1(colores[1]);
-    setBurbuja2(colores[2]);
-    setLinea2(colores[3]);
-    setBurbuja3(colores[4]);
-    Animated.parallel([
-      Animated.timing(animation, {
-        toValue: valorNuevo,
-        duration: 400,
-        useNativeDriver: false,
-      }),
-      Animated.timing(animationO, {
-        toValue: valorNuevoE,
-        duration: 400,
-        useNativeDriver: false,
-      }),
-      Animated.timing(animation2, {
-        toValue: 0,
-        duration: 400,
-        delay: 600,
-        useNativeDriver: false,
-      }),
-      Animated.timing(animationO2, {
-        toValue: 1,
-        duration: 400,
-        delay: 600,
-        useNativeDriver: false,
-      }),
-    ]).start();
-    setAltura(0);
-    setAltura2("100%");
-    setFechaInicio(tiempo[0] + "/" + tiempo[1] + "/" + tiempo[2]);
-    setHoraInicio(tiempo[3] + ":" + tiempo[4]);
-  };
+//------------------------
+//
+  useEffect(() => {     
+    mounted.current = true;
+    return () => mounted.current = false; 
+  });
+//------------------------
 
-  const startAnimate2 = (valorNuevo, valorNuevoE, colores) => {
-    setBurbuja1(colores[0]);
-    setLinea1(colores[1]);
-    setBurbuja2(colores[2]);
-    setLinea2(colores[3]);
-    setBurbuja3(colores[4]);
-    Animated.parallel([
-      Animated.timing(animation2, {
-        toValue: valorNuevo,
-        duration: 400,
-        useNativeDriver: false,
-      }),
-      Animated.timing(animationO2, {
-        toValue: valorNuevoE,
-        duration: 400,
-        useNativeDriver: false,
-      }),
-      Animated.timing(animation3, {
-        toValue: 0,
-        duration: 400,
-        delay: 600,
-        useNativeDriver: false,
-      }),
-      Animated.timing(animationO3, {
-        toValue: 1,
-        duration: 400,
-        delay: 600,
-        useNativeDriver: false,
-      }),
-    ]).start();
-    setAltura2(0);
-    setAltura3("100%");
+//--------------------------------------------------------------//
+//  Hook encargado de escuchar cambios en la propiedad 'estado' //
+//  del objeto 'infoData' para renderizar los componentes       //
+//--------------------------------------------------------------//
+  useEffect(() => {
+    console.log('Habéis modificado los datos'); 
+    console.log(estado)
+    switch(estado){
+        case 1:
+            console.log('Paso 1');
+            setComponente(
+                <>
+                    <InfoExtra
+                        style={{ height: "auto" }}
+                        folio={infoData.folio}
+                        tipoFolio={infoData.tipoFolio}
+                        distrito={infoData.distrito}
+                        cluster={infoData.cluster}
+                        falla={infoData.falla}
+                        causa={infoData.causa}
+                        clientesAfectados={infoData.clientesAfectados}
+                    ></InfoExtra>
+                    <Timeline
+                    buble1={burbuja1}
+                    buble2={burbuja2}
+                    buble3={burbuja3}
+                    line1={linea1}
+                    line2={linea2}
+                    ></Timeline>
+                    <View>
+                        <Tiempos
+                        data="Hora de inicio"
+                        fecha={infoData.fechaInicio}
+                        hora={infoData.horaInicio}
+                        ></Tiempos>
+                        <StepOne
+                            callback={startAnimate.bind(this)}
+                            folio={infoData.folio}
+                            tipoFolio={infoData.tipoFolio}
+                        ></StepOne>
+                    </View>
+                </>
+            );
+        break;
+        case 2: 
+            console.log('Paso 2');
+            llenarCoordenadas();
+            setComponente(
+                <>
+                    <Text>{infoData.longitud}</Text>
+                    <InfoExtra
+                        style={{ height: "auto" }}
+                        folio={infoData.folio}
+                        tipoFolio={infoData.tipoFolio}
+                        distrito={infoData.distrito}
+                        cluster={infoData.cluster}
+                        falla={infoData.falla}
+                        causa={infoData.causa}
+                        clientesAfectados={infoData.clientesAfectados}
+                    ></InfoExtra>
+                    <Timeline
+                        buble1={burbuja1}
+                        buble2={burbuja2}
+                        buble3={burbuja3}
+                        line1={linea1}
+                        line2={linea2}
+                    ></Timeline>
+                    <View>
+                        <Tiempos
+                        data="Llegada al folio"
+                        fecha={infoData.fechaLlegada}
+                        hora={infoData.horaLlegada}
+                        ></Tiempos>
+                        <View style={{alignContent: "center", width:'100%', alignItems:"center"}}>
+                            <StepTwo
+                            latitud={latitud}
+                            longitud={longitud}
+                            eta={infoData.eta}
+                            sla={infoData.sla}
+                            ></StepTwo>
+                        </View>
+                        <Herramientas folio={infoData.folio} tipoFolio={infoData.tipoFolio}></Herramientas>
+                        <MaterialesConcepto folio={infoData.folio} tipoFolio={infoData.tipoFolio}></MaterialesConcepto>
+                        <BotonesStepTwo
+                        callback={startAnimate2.bind(this)}
+                        folio={infoData.folio}
+                        tipoFolio={infoData.tipoFolio}
+                        ></BotonesStepTwo>
+                    </View>
+                </>
+            );
+            break;
+        case 3: 
+            console.log('Paso 3');
+            setComponente(
+                <>
+                    <InfoExtra
+                        style={{ height: "auto" }}
+                        folio={infoData.folio}
+                        tipoFolio={infoData.tipoFolio}
+                        distrito={infoData.distrito}
+                        cluster={infoData.cluster}
+                        falla={infoData.falla}
+                        causa={infoData.causa}
+                        clientesAfectados={infoData.clientesAfectados}
+                    ></InfoExtra>
+                    <Timeline
+                    buble1={burbuja1}
+                    buble2={burbuja2}
+                    buble3={burbuja3}
+                    line1={linea1}
+                    line2={linea2}
+                    ></Timeline>
+                    <StepTwo
+                        latitud={infoData.latitud}
+                        longitud={infoData.longitud}
+                        eta={infoData.eta}
+                        sla={infoData.sla}
+                    ></StepTwo>
+                    <View>
+                        <Tiempos
+                        data="Hora de cierre"
+                        fecha={infoData.fechaActivacion}
+                        hora={infoData.horaActivacion}
+                        ></Tiempos>
+                        <StepThree></StepThree>
+                    </View>
+                </>
+            );
+            break;
+    }      
+    return () => {
+    };
+  }, [estado]);
+
+  const llenarCoordenadas = async() => {
+    let arregloTemporal={
+        latitud:'',
+        longitud:'',
+    };
+    console.log('Estás llenando las coordenadas');
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== 'granted') {
+        console.log('Permission to access location was denied');
+        return;
+    }
+    let location = await Location.getCurrentPositionAsync();
+    arregloTemporal.latitud = location.coords.latitude.toString();
+    arregloTemporal.longitud = location.coords.longitude.toString();
+    // arregloTemporal.latitud = '77.5555';
+    // arregloTemporal.longitud = ',45.3434';
+    let coordenadas = arregloTemporal.latitud + "," + arregloTemporal.longitud;
+    await update(child(ref(database), `folios/correctivos/${infoData.tipoFolio}/${infoData.folio}`), {
+        coordenada: coordenadas
+    }).then((snapshot)=>{});
+    
+    // setInfoData(arregloTemporal);
+    // console.log(infoData);
+    setLatitud(arregloTemporal.latitud);
+    setLatitud(arregloTemporal.longitud);
   };
+  useEffect(() => {
+    return () => {
+
+    }
+  }, [latitud]);
+
+  useEffect(() => {
+    return () => {
+
+    }
+  }, [longitud]);
+
+  useEffect(() => {
+    return () => {
+
+    }
+  }, [componente]);
+
 
   const Iconos = createIconSetFromIcoMoon(
     require("../icons/selection.json"),
@@ -293,8 +522,6 @@ const Correctivo = () => {
   });
 
   if (!iconsLoaded || !fontsLoaded) {
-    // return
-    // <View>
     return <AppLoading />;
   }
 
@@ -316,113 +543,16 @@ const Correctivo = () => {
       </View>
     );
   } else {
-    return (
-      <View style={styles.contenedorPrincipal}>
-        {/* <Cabecera navigation={navegacion}></Cabecera> */}
-        <ScrollView>
-          <InfoExtra
-            style={{ height: "auto" }}
-            folio={folio}
-            tipoFolio={tipoFolio}
-            distrito={distrito}
-            cluster={cluster}
-            falla={falla}
-            causa={causa}
-            clientesAfectados={clientesAfectados}
-          ></InfoExtra>
-          <Timeline
-            buble1={burbuja1}
-            buble2={burbuja2}
-            buble3={burbuja3}
-            line1={linea1}
-            line2={linea2}
-          ></Timeline>
-          {/*Esta vista es de StepOne, cambiará de lugar con los siguientes pasos.*/}
-          <View style={{ height: altura }}>
-            <Animated.View
-              style={[
-                {
-                  transform: [
-                    {
-                      translateX: animation,
-                      // opacity: animationO
-                    },
-                  ],
-                },
-                { opacity: animationO },
-              ]}
-            >
-              <Tiempos
-                data="Hora de inicio"
-                fechaInicio={fechaInicio}
-                horaInicio={horaInicio}
-              ></Tiempos>
-              <View style={{ height: altura }}>
-                <StepOne
-                  callback={startAnimate.bind(this)}
-                  folio={folio}
-                ></StepOne>
-              </View>
-            </Animated.View>
-          </View>
-          {/*Esta vista es de StepTwo, cambiará de lugar con los siguientes pasos.*/}
-          <View style={{ height: altura2 }}>
-            <Animated.View
-              style={[
-                {
-                  transform: [
-                    {
-                      translateX: animation2,
-                      // opacity: animationO
-                    },
-                  ],
-                },
-                { opacity: animationO2 },
-              ]}
-            >
-              <Tiempos
-                data="Llegada al folio"
-                fechaInicio={fechaInicio}
-                horaInicio={horaInicio}
-              ></Tiempos>
-              <StepTwo
-              // callback={startAnimate.bind(this)}
-              ></StepTwo>
-              <Herramientas folio={folio}></Herramientas>
-              <MaterialesConcepto folio={folio}></MaterialesConcepto>
-              <BotonesStepTwo
-                callback={startAnimate2.bind(this)}
-                folio={folio}
-              ></BotonesStepTwo>
-            </Animated.View>
-          </View>
-
-          <View style={{ height: altura3 }}>
-            <Animated.View
-              style={[
-                {
-                  transform: [
-                    {
-                      translateX: animation3,
-                      // opacity: animationO
-                    },
-                  ],
-                },
-                { opacity: animationO3 },
-              ]}
-            >
-              <Tiempos
-                data="Hora de cierre"
-                fechaInicio={fechaInicio}
-                horaInicio={horaInicio}
-              ></Tiempos>
-              <StepThree></StepThree>
-            </Animated.View>
-          </View>
-        </ScrollView>
-      </View>
-    );
-  }
+        if (mounted.current) {
+            return(
+                <View style={styles.contenedorPrincipal}>
+                    <ScrollView>
+                        {componente ? componente : <></>}
+                    </ScrollView>
+                </View>
+            );
+        }
+    }
 };
 
 export default Correctivo;

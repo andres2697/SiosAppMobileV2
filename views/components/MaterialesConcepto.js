@@ -29,6 +29,7 @@
     const db = getDatabase();
     
     const folio = props.folio;
+    const tipoFolio = props.tipoFolio;
 
     const Iconos = createIconSetFromIcoMoon(
       require("../../icons/selection.json"),
@@ -55,11 +56,11 @@
                   let lista = new Array();
                   let i = 0;
                   let arreglo2 = new Array();
-
+                  console.log(props.tipoFolio);
                   let consulta1 = await get(
                     child(
                       ref(db),
-                      `foliosAsignados/${auth.currentUser.uid}/correctivo/activo/${folio}/materialesUsados/miscelaneos`
+                      `folios/correctivos/${tipoFolio}/${folio}/materialesUsados/miscelaneos`
                     )
                   )
                     .then((snapshot) => {   
@@ -104,7 +105,7 @@
                   });
 
                   navigation.navigate('Miscelaneos', {
-                    folio: folio, lista: lista
+                    folio: folio, lista: lista, tipoFolio: tipoFolio,
                   });
 
                 }}
@@ -134,7 +135,7 @@
                   let consulta1 = await get(
                     child(
                       ref(db),
-                      `foliosAsignados/${auth.currentUser.uid}/correctivo/activo/${folio}/materialesUsados/TP`
+                      `folios/correctivos/${tipoFolio}/${folio}/materialesUsados/TP`
                     )
                   )
                     .then((snapshot) => {   
@@ -176,7 +177,7 @@
                   });
 
                   navigation.navigate('MaterialesTP', {
-                    folio: folio, lista: lista
+                    folio: folio, lista: lista, tipoFolio: tipoFolio
                   });
                 }}
                 style={{ width: "65%" }}
@@ -212,7 +213,7 @@
                   await get(
                     child(
                       ref(db),
-                      `conceptos`
+                      `catalogo/conceptos`
                     )
                   )
                     .then((snapshot) => {   
@@ -228,7 +229,7 @@
                     .catch(function (err) {});
                   // console.log(lista);
                   navigation.navigate('Conceptos', {
-                    folio: folio, lista: lista
+                    folio: folio, lista: lista, tipoFolio:tipoFolio
                   });
                 }}
                 style={{ width: "65%" }}

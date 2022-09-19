@@ -21,6 +21,7 @@ import { getDatabase, child, get, ref, set } from "firebase/database";
 
 const Conceptos = (props) => {
   const folio = props.route.params.folio;
+  const tipoFolio = props.route.params.tipoFolio;
   let lista = props.route.params.lista;
   const [conceptos, setConceptos] = useState(new Array());
   const [listaConceptos, setListaConceptos] = useState(new Array());
@@ -41,7 +42,7 @@ const Conceptos = (props) => {
     let consulta1 = await get(
       child(
         ref(db),
-        `foliosAsignados/${auth.currentUser.uid}/correctivo/activo/${folio}/conceptosUsados`
+        `folios/correctivos/${tipoFolio}/${folio}/conceptosUsados`
       )
     )
       .then((snapshot) => {
@@ -109,7 +110,7 @@ const Conceptos = (props) => {
           </Text>
         </View>
         <View style={styles.contenedorCab24}>
-          <Cab24 folio={folio}></Cab24>
+          <Cab24 folio={folio} tipoFolio={tipoFolio}></Cab24>
         </View>
         <View>
           <EntradaConceptos
@@ -118,6 +119,7 @@ const Conceptos = (props) => {
             conceptos={conceptos}
             // conceptosBD={conceptosBD}
             tamanio={index}
+            tipoFolio={tipoFolio}
           ></EntradaConceptos>
         </View>
       </View>

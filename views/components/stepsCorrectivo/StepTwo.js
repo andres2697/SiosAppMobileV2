@@ -20,10 +20,18 @@ import Toast from "react-native-root-toast";
 import { useNavigation } from "@react-navigation/native";
 import { useFonts, Urbanist_400Regular } from "@expo-google-fonts/urbanist";
 import { getDatabase, child, get, ref, limitToFirst } from "firebase/database";
+import { Skeleton } from "moti/skeleton";
+import { MotiView } from 'moti';
 
 const StepTwo = (props) => {
   const navigation = useNavigation();
 
+  function MySkeleton() {
+    return(
+            <Skeleton width={'100%'} height={45} colorMode={'light'}></Skeleton>
+          );
+    }
+  // console.log(props);
   const Iconos = createIconSetFromIcoMoon(
     require("../../../icons/selection.json"),
     "IcoMoon",
@@ -54,39 +62,50 @@ const StepTwo = (props) => {
               selectionColor="transparent"
               autoFocus={false}
               onChangeText={() => {}}
-              value='19.2992515'
+              value={props.latitud}
               editable={false}
               multiline={true}
             ></TextInput>
           </View>
           <View style={styles.contenedorInput}>
             <HelperText style={styles.helper}>Longitud</HelperText>
-            <TextInput
-              style={[styles.inputCustomizedInfo, { marginRight: "2%" }]}
-              underlineColor="transparent"
-              outlineColor="transparent"
-              activeOutlineColor="transparent"
-              selectionColor="transparent"
-              autoFocus={false}
-              onChangeText={() => {}}
-              value='-99.2225652'
-              editable={false}
-              multiline={true}
-            ></TextInput>
+            <MySkeleton>
+            {
+                props.latitud ? 
+                  <TextInput
+                    style={[styles.inputCustomizedInfo, { marginRight: "2%" }]}
+                    underlineColor="transparent"
+                    outlineColor="transparent"
+                    activeOutlineColor="transparent"
+                    selectionColor="transparent"
+                    autoFocus={false}
+                    onChangeText={() => {}}
+                    value={props.longitud}
+                    editable={false}
+                    multiline={true}
+                  ></TextInput>
+                : null 
+              }
+            </MySkeleton>
           </View>
         </View>
         <View style={styles.row}>
           <View style={styles.contenedorInput}>
             <HelperText style={styles.helper}>ETA</HelperText>
             <TextInput
-              style={[styles.inputCustomizedInfo, { marginRight: "2%" }]}
+              style={
+                [styles.inputCustomizedInfo, { marginRight: "2%" }, 
+                {
+                  borderColor: props.eta.color,
+                  borderWidth: 1
+                }]}
               underlineColor="transparent"
               outlineColor="transparent"
               activeOutlineColor="transparent"
               selectionColor="transparent"
               autoFocus={false}
               onChangeText={() => {}}
-              value='ETA'
+              value={props.eta.tiempo}
               editable={false}
               multiline={true}
             ></TextInput>
@@ -94,14 +113,14 @@ const StepTwo = (props) => {
           <View style={styles.contenedorInput}>
             <HelperText style={styles.helper}>SLA</HelperText>
             <TextInput
-              style={[styles.inputCustomizedInfo, { marginRight: "2%" }]}
+              style={[styles.inputCustomizedInfo, { marginRight: "2%" }, {borderColor: props.sla.color, borderWidth: 1}]}
               underlineColor="transparent"
               outlineColor="transparent"
               activeOutlineColor="transparent"
               selectionColor="transparent"
               autoFocus={false}
               onChangeText={() => {}}
-              value='SLA'
+              value={props.sla.tiempo}
               editable={false}
               multiline={true}
             ></TextInput>

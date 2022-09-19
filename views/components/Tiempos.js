@@ -37,10 +37,10 @@ import {
             <HelperText style={styles.helperHoraInicio}>
               { props.data }
             </HelperText>
-            <Text style={{ fontSize: 16 }}>{props.fechaInicio}</Text>
+            <Text style={{ fontSize: 16 }}>{props.fecha}</Text>
           </View>
           <View style={{ justifyContent: "flex-end" }}>
-            <Text style={{ fontSize: 16 }}>{props.horaInicio}</Text>
+            <Text style={{ fontSize: 16 }}>{props.hora}</Text>
           </View>
           <View style={{ justifyContent: "flex-end" }}>
             <Iconos name="calendario" size={40}></Iconos>

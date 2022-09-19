@@ -27,6 +27,7 @@ import { getDatabase, child, get, ref, set, push } from "firebase/database";
 
 const Observaciones = (props) => {
   const folio = props.route.params.folio;
+  const tipoFolio = props.route.params.tipoFolio;
   const [observacion, setObservacion] = useState("");
   const [messages, setMessages] = useState(new Array());
   const [cant, setCant] = useState(0);
@@ -55,7 +56,7 @@ const Observaciones = (props) => {
   const agregarMensaje = async () => {
     const postListRef = ref(
       db,
-      `foliosAsignados/${auth.currentUser.uid}/correctivo/activo/${folio}/observaciones`
+      `folios/correctivos/${tipoFolio}/${folio}/observaciones`
     );
     const newPostRef = push(postListRef);
     set(newPostRef, {
@@ -75,7 +76,7 @@ const Observaciones = (props) => {
     let consulta1 = await get(
       child(
         ref(db),
-        `foliosAsignados/${auth.currentUser.uid}/correctivo/activo/${folio}/observaciones`
+        `folios/correctivos/${tipoFolio}/${folio}/observaciones`
       )
     )
       .then((snapshot) => {
@@ -153,7 +154,7 @@ const Observaciones = (props) => {
               set(
                 child(
                 ref(db),
-                `foliosAsignados/${auth.currentUser.uid}/correctivo/activo/${folio}/observaciones/${element.keyMensaje}`
+                `folios/correctivos/${tipoFolio}/${folio}/observaciones/${element.keyMensaje}`
                 ),
                 null
               );
