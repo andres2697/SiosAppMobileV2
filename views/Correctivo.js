@@ -10,7 +10,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useFonts as Fuentes } from "expo-font";
 import { createIconSetFromIcoMoon } from "@expo/vector-icons";
 import AppLoading from "expo-app-loading";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useNavigation, useRoute, CommonActions } from "@react-navigation/native";
 import { useFonts, Urbanist_400Regular } from "@expo-google-fonts/urbanist";
 import { getDatabase, child, get, ref, limitToFirst, set, update, serverTimestamp } from "firebase/database";
 import { getAuth } from "firebase/auth";
@@ -25,6 +25,7 @@ import MaterialesConcepto from "./components/MaterialesConcepto";
 import BotonesStepTwo from "./components/BotonesStepTwo";
 import Coordenadas from "./components/Coordenadas";
 import * as Location from 'expo-location';
+import { getFunctions, httpsCallable } from "firebase/functions";
 
 const Correctivo = () => {
   const navigation = useNavigation();
@@ -41,6 +42,7 @@ const Correctivo = () => {
 
   const database = getDatabase();
   const auth = getAuth();
+  const functions = getFunctions();
 
   const [infoData, setInfoData] = useState({});  //  Inicialización del objeto de control para almacenamiento de información.
   const [estado, setEstado] = useState(null);
@@ -59,6 +61,8 @@ const Correctivo = () => {
   const [linea2, setLinea2] = useState("#EDF2F9");
 
   const [tituloPagina, setTituloPagina] = useState("");
+
+  const manejarFolioCloud = httpsCallable(functions, "manejarFolio");
 
 //-----------------------------------------------------------------------------//
 //  Función de retorno para actualización de datos calculados                  //
@@ -140,7 +144,7 @@ const Correctivo = () => {
       ":" +
       (minutos < 10 ? "0" + minutos.toString() : minutos.toString());
     /** MODIFICAR LA FORMA DE OBTENCION DEL COLOR DEL BORDE EN calculo.color  **/
-    infoData.sla.color = ( horas > 0 || minutos > tolerancia ) ? 'red' : '';
+    infoData.sla.color = ( horas > 0 || minutos > tolerancia ) ? 'red' : 'transparent';
     await update(child(ref(database), `folios/correctivos/${infoData.tipoFolio}/${infoData.folio}`), {
         sla: infoData.sla.tiempo,
         estado: 3,
@@ -159,7 +163,32 @@ const Correctivo = () => {
     setInfoData(infoData);
     setEstado(3);
   };
-    //----------------------------------------------
+//----------------------------------------------
+
+  const redireccionar = async() => {
+    await manejarFolioCloud({
+        folio: infoData.folio,
+        tipoFolio: infoData.tipoFolio,
+        tecnico: auth.currentUser.uid,
+        incidencia: 2
+      })
+        .then((result) => {
+          navigation.dispatch(CommonActions.reset({
+            index: 1,
+            routes: [
+                {
+                    name: 'Dashboard',
+                    params: {}
+                }
+            ]
+          }))
+        })
+        .catch((error) => {
+          console.log(error.code, error.message, error.details);
+          console.log(`Error: ${error}`);
+        });
+  };
+
 //  Funciones para los calculos de SLA 
 //----------------------------------------------
   const obtenerHoraInicio = async() => {
@@ -322,6 +351,9 @@ const llenarCoordenadas = (latitud, longitud) =>{
     return()=>{     
     }
   };
+
+//--------------------   INICIO DE HOOKS   ---------------------//
+
 //-----------------------------------------------------------//
 //  Hook encargado de llamar a la función de carga de 
 //  información desde base de datos //
@@ -471,6 +503,8 @@ const llenarCoordenadas = (latitud, longitud) =>{
                         <StepThree
                             folio={infoData.folio}
                             tipoFolio={infoData.tipoFolio}
+                            tecnico={auth.currentUser.uid}
+                            callback={redireccionar.bind(this)}
                         ></StepThree>
                     </View>
                 </>

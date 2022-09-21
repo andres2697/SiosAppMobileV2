@@ -28,4 +28,4 @@ const db = getDatabase(firebase);
 connectDatabaseEmulator(db, "192.168.100.187", 9000);
 
 const functions = getFunctions();
-connectFunctionsEmulator(functions, "localhost", 5001);
+connectFunctionsEmulator(functions, "192.168.100.187", 5001);

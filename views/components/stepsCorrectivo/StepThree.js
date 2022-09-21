@@ -20,10 +20,12 @@ import {
   import { useNavigation } from "@react-navigation/native";
   import { useFonts, Urbanist_400Regular } from "@expo-google-fonts/urbanist";
   import { getDatabase, child, get, ref, update } from 'firebase/database';
+  import { getFunctions, httpsCallable } from "firebase/functions";
   
   const StepThree = (props) => {
     const navigation = useNavigation();
     const database = getDatabase();
+    const functions = getFunctions();
   
     const Iconos = createIconSetFromIcoMoon(
       require("../../../icons/selection.json"),
@@ -51,11 +53,11 @@ import {
               await update(child(ref(database), `folios/correctivos/${props.tipoFolio}/${props.folio}`), {
                 estatus: 4,
               }).then((snapshot)=>{
-                navigation.navigate('Dashboard');
               });
+              props.callback();
             }}
           >
-            <Text style={styles.buttonText}>Dashboard</Text>
+            <Text style={styles.buttonText}>Confirmar</Text>
           </TouchableOpacity>
         </View>
       </View>

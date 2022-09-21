@@ -17,6 +17,9 @@ import MaterialesTP from '../vistaMateriales/MaterialesTP';
 import Conceptos from '../vistaConceptos/Conceptos';
 import Observaciones from '../vistaObservaciones/Observaciones';
 import Camara from '../Camara';
+import Correctivo from "../../Correctivo";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import Cabecera from "../Cabecera";
 
 const StackN = createStackNavigator();
 
@@ -43,7 +46,7 @@ const Stack = (props) => {
   }
 
   let ventana = auth.currentUser ? "" : "Login";
-  console.log(ventana);
+  
   return (
     <View style={{ flex: 1 }}>
       <StackN.Navigator initialRouteName={ventana}>
