@@ -28,8 +28,9 @@ const StepOne = (props) => {
   const navigation = useNavigation();
   const db = getDatabase();
   const auth = getAuth();
-  const folio = props.folio;
-  const tipoFolio = props.tipoFolio;
+  // const folio = props.folio;
+  // const tipoFolio = props.tipoFolio;
+  const [infoData, setInfoData] = useState(props.infoData);
   // console.log(db.);
   // var timerInicio = new Date();
   // const [dia, setDia] = useState(timerInicio.getDate());
@@ -73,6 +74,8 @@ const StepOne = (props) => {
         <TouchableOpacity
           style={[styles.button]}
           onPress={async () => {
+            let incidencia = props.incidencia == 1 ? 'preventivos' : 'correctivos';
+            let ruta = `folios/${incidencia}/${infoData.tipoFolio}/${infoData.folio}`;
             let dia = new Date().getDate(serverTimestamp());
             let mes = new Date().getMonth(serverTimestamp()) + 1;
             let anio = new Date().getFullYear(serverTimestamp());
@@ -84,7 +87,7 @@ const StepOne = (props) => {
             let fechaSistema = anio.toString() + '/' + (mes < 10 ?  '0' + mes.toString() : mes.toString()) + '/' + (dia < 10 ?  '0' + dia.toString() : dia.toString());
             let horario = (hora < 10 ?  '0' + hora.toString() : hora.toString()) + ':' + (minuto < 10 ?  '0' + minuto.toString() : minuto.toString());
 
-            update(child(ref(db), `folios/correctivos/${tipoFolio}/${folio}`), {
+            update(child(ref(db), ruta), {
               estado: 2, 
               horaLlegada: {
                 fechaScript: fechaScript,
@@ -96,7 +99,6 @@ const StepOne = (props) => {
             
             props.callback(
                 -50, 0, 
-                ["#2166E5", "#2166E5","#2166E5", "#EDF2F9", "black"], 
                 [ dia < 10 ?  '0' + dia.toString() : dia.toString(), 
                   mes < 10 ?  '0' + mes.toString() : mes.toString(), 
                   anio.toString(), 
@@ -120,7 +122,7 @@ export default StepOne;
 const styles = StyleSheet.create({
   button: {
     flex: 0,
-    width: "40%",
+    width: "45%",
     alignSelf: "center",
     backgroundColor: "#2166E5",
     paddingTop: 10,
@@ -136,5 +138,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     letterSpacing: 1,
     fontWeight: "bold",
+    textAlign: "center"
   },
 });

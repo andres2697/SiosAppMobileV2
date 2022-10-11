@@ -3,7 +3,7 @@ import { getAuth, connectAuthEmulator } from "firebase/auth";
 // import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
 import { getDatabase, connectDatabaseEmulator } from "firebase/database";
 import { getFunctions, connectFunctionsEmulator } from "firebase/functions";
-
+import { connectStorageEmulator, getStorage } from 'firebase/storage';
 // Your web app's Firebase configuration
 const config = {
   apiKey: "AIzaSyBqOgizUSx7Sx4RudGJH841N0ODjepjMl4",
@@ -29,3 +29,6 @@ connectDatabaseEmulator(db, "192.168.100.187", 9000);
 
 const functions = getFunctions();
 connectFunctionsEmulator(functions, "192.168.100.187", 5001);
+
+const storage = getStorage();
+connectStorageEmulator(storage, "192.168.100.187", 9199)

@@ -2,7 +2,8 @@ import {
   StyleSheet,
   View,
   ActivityIndicator,
-  Text
+  Text,
+  RefreshControl
 } from "react-native";
 import React, { Suspense } from "react";
 import { ScrollView } from "react-native-virtualized-view";
@@ -12,8 +13,10 @@ import { createIconSetFromIcoMoon } from "@expo/vector-icons";
 import AppLoading from "expo-app-loading";
 import { useNavigation, useRoute, CommonActions } from "@react-navigation/native";
 import { useFonts, Urbanist_400Regular } from "@expo-google-fonts/urbanist";
+
 import { getDatabase, child, get, ref, limitToFirst, set, update, serverTimestamp } from "firebase/database";
 import { getAuth } from "firebase/auth";
+
 import InfoExtra from "./components/InfoExtra";
 import Timeline from "./components/TimeLine";
 import Tiempos from "./components/Tiempos";
@@ -24,8 +27,14 @@ import Herramientas from "./components/Herramientas";
 import MaterialesConcepto from "./components/MaterialesConcepto";
 import BotonesStepTwo from "./components/BotonesStepTwo";
 import Coordenadas from "./components/Coordenadas";
+
 import * as Location from 'expo-location';
 import { getFunctions, httpsCallable } from "firebase/functions";
+
+import { Skeleton } from "moti/skeleton";
+import { MotiView } from "moti";
+
+const Spacer = ({ height = 30 }) => <MotiView style={{ height }} />;
 
 const Correctivo = () => {
   const navigation = useNavigation();
@@ -46,14 +55,12 @@ const Correctivo = () => {
 
   const [infoData, setInfoData] = useState({});  //  Inicialización del objeto de control para almacenamiento de información.
   const [estado, setEstado] = useState(null);
+  const [refresh, setRefresh] = useState(false);
 //   const [latitud, setLatitud] = useState('');
 //   const [longitud, setLongitud] = useState('');
 
   const [componente, setComponente] = useState(<></>);
-//   const [paso, setPaso] = useState(1);
-  const [altura, setAltura] = useState("100%");
-  const [altura2, setAltura2] = useState(0);
-  const [altura3, setAltura3] = useState(0);
+  
   const [burbuja1, setBurbuja1] = useState("#2166E5");
   const [burbuja2, setBurbuja2] = useState("black");
   const [burbuja3, setBurbuja3] = useState("black");
@@ -63,18 +70,59 @@ const Correctivo = () => {
   const [tituloPagina, setTituloPagina] = useState("");
 
   const manejarFolioCloud = httpsCallable(functions, "manejarFolio");
+  
+  function MySkeleton() {
+    return (
+      <MotiView
+        animate={{ backgroundColor: 'white' }}
+        transition={{
+          type: 'timing',
+        }}
+        style={{
+          width: "100%",
+          height: "100%",
+          marginTop: 10,
+          alignContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Spacer />
+        <View style={{ width: "100%", height: "auto", alignSelf:"center", alignContent:"center", alignItems: "center", justifyContent:"center" }}>
+          <Skeleton width={"85%"} height={45} colorMode={"light"}></Skeleton>
+        </View>
+        <Spacer />
+        <View style={{ width: "90%", height: "auto", flexDirection: "row", marginTop:20, alignContent:"center", justifyContent:'space-between' }}>
+          <Skeleton width={80} height={80} radius={100} colorMode={"light"}></Skeleton>
+          <Skeleton width={80} height={80} radius={100} colorMode={"light"}></Skeleton>
+          <Skeleton width={80} height={80} radius={100} colorMode={"light"}></Skeleton>
+        </View>
+        <Spacer />
+        <View style={{ width: "100%", height: "auto", alignSelf:"center", alignContent:"center", alignItems: "center", justifyContent:"center" }}>
+          <Skeleton width={"85%"} height={45} colorMode={"light"}></Skeleton>
+        </View>
+        <Spacer />
+        <Skeleton width={"60%"} height={45} colorMode={"light"}></Skeleton>
+      </MotiView>
+    );
+  }
+
+  const pullingView = async() => {
+    setRefresh(true);
+    await cargarInfo();
+    setRefresh(false);
+  }
 
 //-----------------------------------------------------------------------------//
 //  Función de retorno para actualización de datos calculados                  //
 //  por la aplicación en el paso 2 (hora de llegada, eta, latitud y longitud). //
 //-----------------------------------------------------------------------------//
-  const startAnimate = async(valorNuevo, valorNuevoE, colores, tiempo, fechaSistemaInicio, horaSistemaInicio) => {
+  const startAnimate = async(valorNuevo, valorNuevoE, tiempo, fechaSistemaInicio, horaSistemaInicio) => {
 
-    setBurbuja1(colores[0]);
-    setLinea1(colores[1]);
-    setBurbuja2(colores[2]);
-    setLinea2(colores[3]);
-    setBurbuja3(colores[4]);
+    setBurbuja1("#2166E5");
+    setLinea1("#2166E5");
+    setBurbuja2("#2166E5");
+    setLinea2("#EDF2F9");
+    setBurbuja3("black");
     infoData.fechaLlegada = tiempo[0] + "/" + tiempo[1] + "/" + tiempo[2];
     infoData.horaLlegada = tiempo[3] + ":" + tiempo[4];
     infoData.latitud = '';
@@ -94,7 +142,10 @@ const Correctivo = () => {
     infoData.eta.color = minutos > 30 ? 'red' : 'transparent';
     
     await update(child(ref(database), `folios/correctivos/${infoData.tipoFolio}/${infoData.folio}`), {
-        eta: infoData.eta.tiempo
+        eta: {
+          tiempo: infoData.eta.tiempo,
+          color: infoData.eta.color
+        },
     }).then((snapshot)=>{
 
         // console.log(infoData);
@@ -114,12 +165,13 @@ const Correctivo = () => {
 //  por la aplicación en el paso 3 (hora de llegada y sla).     //
 //--------------------------------------------------------------//
   const startAnimate2 = async(valorNuevo, valorNuevoE, colores) => {
+    console.log(infoData);
     setComponente(null);
-    setBurbuja1(colores[0]);
-    setLinea1(colores[1]);
-    setBurbuja2(colores[2]);
-    setLinea2(colores[3]);
-    setBurbuja3(colores[4]);
+    setBurbuja1("#2166E5");
+    setLinea1("#2166E5");
+    setBurbuja2("#2166E5");
+    setLinea2("#2166E5");
+    setBurbuja3("#2166E5");
 
     let activacion = {};
     let inicio = {};
@@ -146,7 +198,10 @@ const Correctivo = () => {
     /** MODIFICAR LA FORMA DE OBTENCION DEL COLOR DEL BORDE EN calculo.color  **/
     infoData.sla.color = ( horas > 0 || minutos > tolerancia ) ? 'red' : 'transparent';
     await update(child(ref(database), `folios/correctivos/${infoData.tipoFolio}/${infoData.folio}`), {
-        sla: infoData.sla.tiempo,
+        sla: {
+          tiempo: infoData.sla.tiempo,
+          color: infoData.sla.color
+        },
         estado: 3,
         estatus: 3,
     }).then((snapshot)=>{
@@ -265,7 +320,7 @@ const llenarCoordenadas = (latitud, longitud) =>{
 //  Función encargada de almacenar en el objeto 'infoData' la   //
 //  información del folio desde la base de datos.               //
 //--------------------------------------------------------------//  
-  const cargarInfo = () => {
+  const cargarInfo = async() => {
     // console.log('Entraste a la función');
     infoData.eta = {
         tiempo: '--:--',
@@ -277,12 +332,20 @@ const llenarCoordenadas = (latitud, longitud) =>{
 
     };
     let ruta;
-    get(child(ref(database), 
+    let coordenada;
+    await get(child(ref(database), 
         `foliosAsignados/correctivos/activo/${auth.currentUser.uid}`
     ))
     .then(async(snapshot)=>{
+      if(snapshot.exists()){
+        setComponente(
+          <View style={styles.vistaSkeleton}>
+            <MySkeleton></MySkeleton>
+          </View>
+        );
         let llave;
         let tipoFolioLlave;
+        let edo;
         snapshot.forEach((folioActivo)=>{
             llave =  Object.keys(folioActivo.val())[0];
             tipoFolioLlave = folioActivo.key;
@@ -299,54 +362,88 @@ const llenarCoordenadas = (latitud, longitud) =>{
             )
         )
         .then((snapshot) => {
-        snapshot.forEach((element) => {
-            switch(element.key){
-                case 'distrito':   
-                    infoData.distrito = element.val();
-                break;
-                case 'cluster': 
-                    infoData.cluster = element.val();
-                break;
-                case 'falla': 
-                    infoData.falla = element.val();
-                break;
-                case 'causa': 
-                    infoData.causa = element.val();
-                break;
-                case 'clientesAfectados': 
-                    infoData.clientesAfectados = element.val();
-                break;
-                case 'estado': 
-                    // setEstado(element.val());
-                    if (element.val() == 2) {
-                        setBurbuja1("#2166E5");
-                        setLinea1("#2166E5");
-                        setBurbuja2("#2166E5");
-                        setLinea2("#EDF2F9");
-                        setBurbuja3("black");
-                    } else if (element.val() == 3) {
-                        setBurbuja1("#2166E5");
-                        setLinea1("#2166E5");
-                        setBurbuja2("#2166E5");
-                        setLinea2("#EDF2F9");
-                        setBurbuja3("black");
-                    }
-                break;
-                case 'horaInicio':
+          snapshot.forEach((element) => {
+              switch(element.key){
+                  case 'distrito':   
+                      infoData.distrito = element.val();
+                  break;
+                  case 'cluster': 
+                      infoData.cluster = element.val();
+                  break;
+                  case 'falla': 
+                      infoData.falla = element.val();
+                  break;
+                  case 'causa': 
+                      infoData.causa = element.val();
+                  break;
+                  case 'clientesAfectados': 
+                      infoData.clientesAfectados = element.val();
+                  break;
+                  case 'estado':
+                      edo = element.val();  
+                      if (element.val() == 2) {
+                          setBurbuja1("#2166E5");
+                          setLinea1("#2166E5");
+                          setBurbuja2("#2166E5");
+                          setLinea2("#EDF2F9");
+                          setBurbuja3("black");
+                      } else if (element.val() == 3) {
+                          setBurbuja1("#2166E5");
+                          setLinea1("#2166E5");
+                          setBurbuja2("#2166E5");
+                          setLinea2("#EDF2F9");
+                          setBurbuja3("black");
+                      }
+                  break;
+                  case 'horaInicio':
                     infoData.fechaInicio = element.val()["fechaScript"];
                     infoData.horaInicio = element.val()["hora"];
-                break;
-            }
-            setTituloPagina("Folio correctivo");
-            // setInfoData(infoData);
-        });
+                  break;
+                  case 'horaLlegada':
+                    infoData.fechaLlegada = element.val()["fechaScript"];
+                    infoData.horaLlegada = element.val()["hora"];
+                  break;
+                  case 'horaActivacion':
+                    infoData.fechaActivacion = element.val()["fechaScript"];
+                    infoData.horaActivacion = element.val()["hora"];
+                  break;
+                  case 'olt': 
+                    infoData.olt = element.val();
+                  break;
+                  case 'sla':
+                    infoData.sla.tiempo = element.val()["tiempo"];
+                    infoData.sla.color = element.val()["color"];
+                  break;
+                  case 'eta': 
+                  infoData.eta.tiempo = element.val()["tiempo"];
+                  infoData.eta.color = element.val()["color"];
+                  break;
+                  case 'coordenada': 
+                  coordenada = element.val().split(',');
+                  infoData.latitud = coordenada[0];
+                  infoData.longitud = coordenada[1];
+                  break;
+              }
+              setTituloPagina("Folio correctivo");
+              setEstado(edo);
+              // setInfoData(infoData);
+          });
         })
         .catch(function (err) {
             console.log(err);
         });
         setInfoData(infoData);
-        setEstado(1);
+        setEstado(edo);
         // setMostrarPasoUno(true);
+      }else{
+        setComponente(
+          <View style={{width:'100%', height:'100%', justifyContent:"center", alignItems:"center", marginVertical:'60%'}}>
+            <View style={{width: '80%', height:'100%'}}>
+              <Text style={{textAlign:"center", fontSize: 22, fontWeight:'800'}}>Actualmente no cuentas con folios asignados.</Text>
+            </View>
+          </View>
+        )
+      }
     });
     return()=>{     
     }
@@ -377,40 +474,35 @@ const llenarCoordenadas = (latitud, longitud) =>{
 //  del objeto 'infoData' para renderizar los componentes       //
 //--------------------------------------------------------------//
   useEffect(() => {
-    console.log('Habéis modificado los datos'); 
-    console.log(estado)
+    // console.log('Habéis modificado los datos'); 
+    // console.log(estado)
     switch(estado){
         case 1:
             console.log('Paso 1');
             setComponente(
                 <>
                     <InfoExtra
-                        style={{ height: "auto" }}
-                        folio={infoData.folio}
-                        tipoFolio={infoData.tipoFolio}
-                        distrito={infoData.distrito}
-                        cluster={infoData.cluster}
-                        falla={infoData.falla}
-                        causa={infoData.causa}
-                        clientesAfectados={infoData.clientesAfectados}
+                      style={{ height: "auto" }}
+                      infoData={infoData}
+                      estadoInicial={false}
+                      mostrarMasInfo={true}
                     ></InfoExtra>
                     <Timeline
-                    buble1={burbuja1}
-                    buble2={burbuja2}
-                    buble3={burbuja3}
-                    line1={linea1}
-                    line2={linea2}
+                      buble1={burbuja1}
+                      buble2={burbuja2}
+                      buble3={burbuja3}
+                      line1={linea1}
+                      line2={linea2}
                     ></Timeline>
                     <View>
                         <Tiempos
-                        data="Hora de inicio"
-                        fecha={infoData.fechaInicio}
-                        hora={infoData.horaInicio}
+                          data="Hora de inicio"
+                          infoData={infoData}
                         ></Tiempos>
                         <StepOne
-                            callback={startAnimate.bind(this)}
-                            folio={infoData.folio}
-                            tipoFolio={infoData.tipoFolio}
+                          callback={startAnimate.bind(this)}
+                          infoData={infoData}
+                          incidencia={2}
                         ></StepOne>
                     </View>
                 </>
@@ -418,17 +510,14 @@ const llenarCoordenadas = (latitud, longitud) =>{
         break;
         case 2: 
             console.log('Paso 2');
+            console.log(infoData);
             setComponente(
                 <>
                     <InfoExtra
                         style={{ height: "auto" }}
-                        folio={infoData.folio}
-                        tipoFolio={infoData.tipoFolio}
-                        distrito={infoData.distrito}
-                        cluster={infoData.cluster}
-                        falla={infoData.falla}
-                        causa={infoData.causa}
-                        clientesAfectados={infoData.clientesAfectados}
+                        infoData = {infoData}
+                        estadoInicial={false}
+                        mostrarMasInfo={true}
                     ></InfoExtra>
                     <Timeline
                         buble1={burbuja1}
@@ -440,25 +529,21 @@ const llenarCoordenadas = (latitud, longitud) =>{
                     <View>
                         <Tiempos
                         data="Llegada al folio"
-                        fecha={infoData.fechaLlegada}
-                        hora={infoData.horaLlegada}
+                        infoData={infoData}
                         ></Tiempos>
                         <View style={{alignContent: "center", width:'100%', alignItems:"center"}}>
                             <StepTwo
-                                folio={infoData.folio}
-                                tipoFolio={infoData.tipoFolio}
-                                eta={infoData.eta}
-                                sla={infoData.sla}
+                                infoData={infoData}
                                 estado={estado}
                                 callback={llenarCoordenadas.bind(this)}
                             ></StepTwo>
                         </View>
                         <Herramientas folio={infoData.folio} tipoFolio={infoData.tipoFolio}></Herramientas>
-                        <MaterialesConcepto folio={infoData.folio} tipoFolio={infoData.tipoFolio}></MaterialesConcepto>
+                        <MaterialesConcepto folio={infoData.folio} tipoFolio={infoData.tipoFolio} incidencia={2}></MaterialesConcepto>
                         <BotonesStepTwo
-                        callback={startAnimate2.bind(this)}
-                        folio={infoData.folio}
-                        tipoFolio={infoData.tipoFolio}
+                          callback={startAnimate2.bind(this)}
+                          infoData={infoData}
+                          incidencia={2}
                         ></BotonesStepTwo>
                     </View>
                 </>
@@ -471,13 +556,9 @@ const llenarCoordenadas = (latitud, longitud) =>{
                 <>
                     <InfoExtra
                         style={{ height: "auto" }}
-                        folio={infoData.folio}
-                        tipoFolio={infoData.tipoFolio}
-                        distrito={infoData.distrito}
-                        cluster={infoData.cluster}
-                        falla={infoData.falla}
-                        causa={infoData.causa}
-                        clientesAfectados={infoData.clientesAfectados}
+                        infoData={infoData}
+                        estadoInicial={false}
+                        mostrarMasInfo={true}
                     ></InfoExtra>
                     <Timeline
                     buble1={burbuja1}
@@ -488,23 +569,19 @@ const llenarCoordenadas = (latitud, longitud) =>{
                     ></Timeline>
                     <View style={{alignContent: "center", width:'100%', alignItems:"center"}}>
                             <Coordenadas
-                                latitud={infoData.latitud}
-                                longitud={infoData.longitud}
-                                eta={infoData.eta}
-                                sla={infoData.sla}
+                                infoData={infoData}
                             ></Coordenadas>
                         </View>
                     <View>
                         <Tiempos
                         data="Hora de cierre"
-                        fecha={infoData.fechaActivacion}
-                        hora={infoData.horaActivacion}
+                        infoData={infoData}
                         ></Tiempos>
                         <StepThree
-                            folio={infoData.folio}
-                            tipoFolio={infoData.tipoFolio}
+                            infoData={infoData}
                             tecnico={auth.currentUser.uid}
                             callback={redireccionar.bind(this)}
+                            incidencia={2}
                         ></StepThree>
                     </View>
                 </>
@@ -520,6 +597,13 @@ const llenarCoordenadas = (latitud, longitud) =>{
 
     }
   }, [componente]);
+
+  useEffect(() => {
+    return () => {
+
+    }
+  }, [infoData]);
+
 
 
   const Iconos = createIconSetFromIcoMoon(
@@ -541,7 +625,7 @@ const llenarCoordenadas = (latitud, longitud) =>{
   if (!cargado) {
     setTimeout(function () {
       setCargado(true);
-    }, 1200);
+    }, 50);
     clearTimeout();
     return (
       <View
@@ -559,7 +643,19 @@ const llenarCoordenadas = (latitud, longitud) =>{
         if (mounted.current) {
             return(
                 <View style={styles.contenedorPrincipal}>
-                    <ScrollView>
+                    <ScrollView
+                      refreshControl={
+                        <RefreshControl
+                          refreshing={refresh}
+                          onRefresh={()=>pullingView()}
+                        />
+                      }
+                    >
+                        <View style={ styles.contenedorTitulo }>
+                            <Text style={ styles.titulo }>
+                                {tituloPagina}
+                            </Text>
+                        </View>
                         {componente ? componente : <></>}
                     </ScrollView>
                 </View>

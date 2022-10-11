@@ -1,4 +1,5 @@
-import {
+  import { useState } from "react";
+  import {
     StyleSheet,
     View,
     Text,
@@ -13,6 +14,7 @@ import {
   const Tiempos = (props) => {
 
     const navigation = useNavigation();
+    const [infoData, setInfoData] = useState(props.infoData);
 
     const Iconos = createIconSetFromIcoMoon(
         require("../../icons/selection.json"),
@@ -37,10 +39,16 @@ import {
             <HelperText style={styles.helperHoraInicio}>
               { props.data }
             </HelperText>
-            <Text style={{ fontSize: 16 }}>{props.fecha}</Text>
+            <Text style={{ fontSize: 16 }}>{
+              props.data == 'Hora de inicio' ?  infoData.fechaInicio : 
+                (props.data == 'Llegada al folio' ? infoData.fechaLlegada : infoData.fechaActivacion)
+            }</Text>
           </View>
           <View style={{ justifyContent: "flex-end" }}>
-            <Text style={{ fontSize: 16 }}>{props.hora}</Text>
+            <Text style={{ fontSize: 16 }}>{
+              props.data == 'Hora de inicio' ?  infoData.horaInicio : 
+                (props.data == 'Llegada al folio' ? infoData.horaLlegada : infoData.horaActivacion)
+            }</Text>
           </View>
           <View style={{ justifyContent: "flex-end" }}>
             <Iconos name="calendario" size={40}></Iconos>

@@ -28,7 +28,8 @@ import { getDatabase, child, get, ref, set, push } from "firebase/database";
 const Observaciones = (props) => {
   const folio = props.route.params.folio;
   const tipoFolio = props.route.params.tipoFolio;
-  const [observacion, setObservacion] = useState("");
+  const incidencia = props.route.params.incidencia == 1 ? 'preventivos' : 'correctivos';
+  const [observacion, setObservacion] = useState('');
   const [messages, setMessages] = useState(new Array());
   const [cant, setCant] = useState(0);
   const [bgcolor, setBgcolor] = useState(new Array());
@@ -56,11 +57,13 @@ const Observaciones = (props) => {
   const agregarMensaje = async () => {
     const postListRef = ref(
       db,
-      `folios/correctivos/${tipoFolio}/${folio}/observaciones`
+      `folios/${incidencia}/${tipoFolio}/${folio}/notas`
     );
     const newPostRef = push(postListRef);
     set(newPostRef, {
-      observacion,
+      color: 'bg-gray-100',
+      colorLateral: 'bg-gray-400',
+      texto: observacion,
     });
 
     let arrayId = newPostRef.toString().split("/");
@@ -76,7 +79,7 @@ const Observaciones = (props) => {
     let consulta1 = await get(
       child(
         ref(db),
-        `folios/correctivos/${tipoFolio}/${folio}/observaciones`
+        `folios/${incidencia}/${tipoFolio}/${folio}/notas`
       )
     )
       .then((snapshot) => {
@@ -90,7 +93,7 @@ const Observaciones = (props) => {
             ...messages,
             {
               keyMensaje: element.key,
-              mensaje: element.val().observacion,
+              mensaje: element.val().texto,
             },
           ]);
 
@@ -154,7 +157,7 @@ const Observaciones = (props) => {
               set(
                 child(
                 ref(db),
-                `folios/correctivos/${tipoFolio}/${folio}/observaciones/${element.keyMensaje}`
+                `folios/${incidencia}/${tipoFolio}/${folio}/observaciones/${element.keyMensaje}`
                 ),
                 null
               );

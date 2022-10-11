@@ -27,9 +27,9 @@ import {
   const Coordenadas = (props) => {
     const database = getDatabase();
     const navigation = useNavigation();
-  
-    const [latitud, setLatitud] = useState(props.latitud);
-    const [longitud, setLongitud] = useState(props.longitud);
+    const [infoData, setInfoData] = useState(props.infoData);
+    const [latitud, setLatitud] = useState(infoData.latitud);
+    const [longitud, setLongitud] = useState(infoData.longitud);
     Location.setGoogleApiKey("AIzaSyCL6SrNElBbvIVhJtW3t_K4cn8OasyznsQ");
   
     function MySkeleton() {
@@ -124,7 +124,7 @@ import {
                 style={
                   [styles.inputCustomizedInfo, { marginRight: "2%" }, 
                   {
-                    borderColor: props.eta.color,
+                    borderColor: infoData.eta.color,
                     borderWidth: 1
                   }]}
                 underlineColor="transparent"
@@ -133,7 +133,7 @@ import {
                 selectionColor="transparent"
                 autoFocus={false}
                 onChangeText={() => {}}
-                value={props.eta.tiempo}
+                value={infoData.eta.tiempo}
                 editable={false}
                 multiline={true}
               ></TextInput>
@@ -141,14 +141,14 @@ import {
             <View style={styles.contenedorInput}>
               <HelperText style={styles.helper}>SLA</HelperText>
               <TextInput
-                style={[styles.inputCustomizedInfo, { marginRight: "2%" }, {borderColor: props.sla.color, borderWidth: 1}]}
+                style={[styles.inputCustomizedInfo, { marginRight: "2%" }, {borderColor: infoData.sla.color, borderWidth: 1}]}
                 underlineColor="transparent"
                 outlineColor="transparent"
                 activeOutlineColor="transparent"
                 selectionColor="transparent"
                 autoFocus={false}
                 onChangeText={() => {}}
-                value={props.sla.tiempo}
+                value={infoData.sla.tiempo}
                 editable={false}
                 multiline={true}
               ></TextInput>

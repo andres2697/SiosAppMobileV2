@@ -10,7 +10,7 @@ import {
     TextInput,
     ScrollView
   } from "react-native";
-  import { useState } from "react";
+  import { useEffect, useState } from "react";
   import { HelperText, TextInput as Paper } from "react-native-paper";
   import { useFonts as Fuentes } from "expo-font";
   import { createIconSetFromIcoMoon } from "@expo/vector-icons";
@@ -21,31 +21,10 @@ import {
   import { useFonts,Urbanist_400Regular } from "@expo-google-fonts/urbanist";
 
   
-  const InfoExtra = (props) => {
+  const InfoExtraEstatico = (props) => {
 
     const navigation = useNavigation();
-    const [degrees, setDegrees] = useState(0);
-    const [estado, setEstado] = useState(false);
-    const [animation, setAnimation] = useState(new Animated.Value(0));
-    const [animationO, setAnimationE] = useState(new Animated.Value(0));
     const [infoData, setInfoData] = useState(props.infoData);
-
-    // console.log(props);
-
-    startAnimateInfo = (valorNuevo, valorNuevoE) => {
-        Animated.parallel([
-            Animated.timing(animation, {
-                toValue: valorNuevo,
-                duration: 300,
-                useNativeDriver: false
-            }),
-            Animated.timing(animationO, {
-                toValue: valorNuevoE,
-                duration: 10,
-                useNativeDriver: false
-            }),
-        ]).start();
-    }
 
     const Iconos = createIconSetFromIcoMoon(
         require("../../icons/selection.json"),
@@ -58,6 +37,10 @@ import {
     const [fontsLoaded] = useFonts({
         Urbanist_400Regular,
     });
+
+    useEffect(()=>{
+      return ()=> {}
+    }, [infoData]);
     
     if (!iconsLoaded || !fontsLoaded) {
         return <AppLoading />;
@@ -97,11 +80,8 @@ import {
         </View>
 
         <View>
-          <Animated.View
-            style={{
-              height: animation,
-              opacity: animationO,
-            }}
+          <View
+            style={{height: 238}}
           >
             <View style={styles.infoExtra}>
               {/* <Text> Componente </Text> */}
@@ -175,40 +155,13 @@ import {
                 ></TextInput>
               </View>
             </View>
-          </Animated.View>
-        </View>
-        <View style={styles.contenedorExpandirMas}>
-          <TouchableWithoutFeedback
-            onPress={() => {
-              degrees == 0 ? setDegrees(1) : setDegrees(0);
-              estado == false ? startAnimateInfo(238, 1) : startAnimateInfo(0, 0);
-              setEstado(!estado);
-            }}
-          >
-            <View
-              style={[
-                {
-                  flex: 0,
-                  paddingRight: "5%",
-                  justifyContent: "flex-start",
-                  transform: [{ rotateX: degrees == 0 ? "0deg" : "180deg" }],
-                },
-              ]}
-            >
-              <Iconos
-                name="expandirMas"
-                size={60}
-                color={"black"}
-                style={{ marginVertical: "-12%" }}
-              ></Iconos>
-            </View>
-          </TouchableWithoutFeedback>
+          </View>
         </View>
       </View>
     );
   }
 
-export default InfoExtra;
+export default InfoExtraEstatico;
 
 const styles = StyleSheet.create({
     contenedorComponente: {

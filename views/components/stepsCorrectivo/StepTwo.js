@@ -27,9 +27,10 @@ import * as Location from 'expo-location';
 const StepTwo = (props) => {
   const database = getDatabase();
   const navigation = useNavigation();
-
-  const [latitud, setLatitud] = useState(null);
-  const [longitud, setLongitud] = useState(null);
+  
+  const [infoData, setInfoData] = useState(props.infoData);
+  const [latitud, setLatitud] = useState(infoData.latitud === undefined ? null : infoData.latitud);
+  const [longitud, setLongitud] = useState(infoData.longitud === undefined ? null : infoData.longitud);
   Location.setGoogleApiKey("AIzaSyCL6SrNElBbvIVhJtW3t_K4cn8OasyznsQ");
 
   function MySkeleton() {
@@ -39,29 +40,31 @@ const StepTwo = (props) => {
   }
 
   const llenarCoordenadas = async() => {
-    let arregloTemporal={
-        latitud:'',
-        longitud:'',
-    };
-    console.log('Estás llenando las coordenadas');
-    let { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== 'granted') {
-        console.log('Permission to access location was denied');
-        return;
+    if(!latitud && !longitud){
+      let arregloTemporal={
+          latitud:'',
+          longitud:'',
+      };
+      console.log('Estás llenando las coordenadas');
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+          console.log('Permission to access location was denied');
+          return;
+      }
+      let location = await Location.getCurrentPositionAsync();
+      arregloTemporal.latitud = location.coords.latitude.toString();
+      arregloTemporal.longitud = location.coords.longitude.toString();
+      let coordenadas = arregloTemporal.latitud + "," + arregloTemporal.longitud;
+      await update(child(ref(database), `folios/correctivos/${infoData.tipoFolio}/${infoData.folio}`), {
+          coordenada: coordenadas
+      }).then((snapshot)=>{});
+      setLatitud(arregloTemporal.latitud);
+      setLongitud(arregloTemporal.longitud);
     }
-    let location = await Location.getCurrentPositionAsync();
-    arregloTemporal.latitud = location.coords.latitude.toString();
-    arregloTemporal.longitud = location.coords.longitude.toString();
-    let coordenadas = arregloTemporal.latitud + "," + arregloTemporal.longitud;
-    await update(child(ref(database), `folios/correctivos/${props.tipoFolio}/${props.folio}`), {
-        coordenada: coordenadas
-    }).then((snapshot)=>{});
-    setLatitud(arregloTemporal.latitud);
-    setLongitud(arregloTemporal.longitud);
   };
 
   useEffect(()=>{
-    if(props.estado == 2){
+    if(!latitud && !longitud){
       llenarCoordenadas();
     }
     return () => {
@@ -71,6 +74,11 @@ const StepTwo = (props) => {
 
   useEffect(()=>{
     setLatitud(latitud);
+    if(longitud){
+      props.callback(
+        latitud, longitud
+      );
+    }
     return () => {
 
     }
@@ -78,9 +86,11 @@ const StepTwo = (props) => {
 
   useEffect(()=>{
     setLongitud(longitud);
-    props.callback(
-      latitud, longitud
-    );
+    if(latitud){
+      props.callback(
+        latitud, longitud
+      );
+    }
     return () => {
 
     }
@@ -152,7 +162,7 @@ const StepTwo = (props) => {
               style={
                 [styles.inputCustomizedInfo, { marginRight: "2%" }, 
                 {
-                  borderColor: props.eta.color,
+                  borderColor: infoData.eta.color,
                   borderWidth: 1
                 }]}
               underlineColor="transparent"
@@ -161,7 +171,7 @@ const StepTwo = (props) => {
               selectionColor="transparent"
               autoFocus={false}
               onChangeText={() => {}}
-              value={props.eta.tiempo}
+              value={infoData.eta.tiempo}
               editable={false}
               multiline={true}
             ></TextInput>
@@ -169,14 +179,14 @@ const StepTwo = (props) => {
           <View style={styles.contenedorInput}>
             <HelperText style={styles.helper}>SLA</HelperText>
             <TextInput
-              style={[styles.inputCustomizedInfo, { marginRight: "2%" }, {borderColor: props.sla.color, borderWidth: 1}]}
+              style={[styles.inputCustomizedInfo, { marginRight: "2%" }, {borderColor: infoData.sla.color, borderWidth: 1}]}
               underlineColor="transparent"
               outlineColor="transparent"
               activeOutlineColor="transparent"
               selectionColor="transparent"
               autoFocus={false}
               onChangeText={() => {}}
-              value={props.sla.tiempo}
+              value={infoData.sla.tiempo}
               editable={false}
               multiline={true}
             ></TextInput>

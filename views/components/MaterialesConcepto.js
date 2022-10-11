@@ -30,6 +30,8 @@
     
     const folio = props.folio;
     const tipoFolio = props.tipoFolio;
+    const incidencia = props.incidencia;
+    const paddingIconos = incidencia == 1 ? 20 : 0;
 
     const Iconos = createIconSetFromIcoMoon(
       require("../../icons/selection.json"),
@@ -49,8 +51,11 @@
 
       return (
         <View style={styles.contenedorMaterialesConcepto}>
+          {
+            incidencia == 1 ? <View style={{width: '10%', height:45}}></View> : null
+          }
           <View style={styles.contenedorSegmentos}>
-            <View style={styles.contenedorGris}>
+            <View style={[styles.contenedorGris]}>
               <TouchableWithoutFeedback
                 onPress={async() => {
                   let lista = new Array();
@@ -122,7 +127,11 @@
               </Text>
             </View>
           </View>
-  
+
+          {
+            incidencia == 1 ? <View style={{width: '10%', height:45}}></View> : null
+          }
+
           <View style={styles.contenedorSegmentos}>
             <View style={styles.contenedorGris}>
               <TouchableWithoutFeedback
@@ -203,46 +212,48 @@
               </Text>
             </View>
           </View>
-  
-          <View style={styles.contenedorSegmentos}>
-            <View style={styles.contenedorGris}>
-              <TouchableWithoutFeedback
-                onPress={async() => {
-                  let lista = new Array();
-                  let i = 0;
-                  await get(
-                    child(
-                      ref(db),
-                      `catalogo/conceptos`
+          {
+            incidencia == 2 ?
+            <View style={styles.contenedorSegmentos}>
+              <View style={styles.contenedorGris}>
+                <TouchableWithoutFeedback
+                  onPress={async() => {
+                    let lista = new Array();
+                    let i = 0;
+                    await get(
+                      child(
+                        ref(db),
+                        `catalogo/conceptos`
+                      )
                     )
-                  )
-                    .then((snapshot) => {   
-                      // console.log(snapshot);    
-                      snapshot.forEach(element => {
-                        if(element.key !== 'CAB-024'){
-                          lista.push({title: element.key, id: i});
-                          i = i + 1;
-                        }
-                        // console.log(element.key);
-                      });
-                    })
-                    .catch(function (err) {});
-                  // console.log(lista);
-                  navigation.navigate('Conceptos', {
-                    folio: folio, lista: lista, tipoFolio:tipoFolio
-                  });
-                }}
-                style={{ width: "65%" }}
-              >
-                <View style={styles.contenedorBlanco}>
-                  <Iconos name="conceptos" size={32}></Iconos>
-                </View>
-              </TouchableWithoutFeedback>
-            </View>
-            <View style={styles.contenedorTexto}>
-              <Text style={{ fontWeight: "bold", fontSize: 15 }}>Conceptos</Text>
-            </View>
-          </View>
+                      .then((snapshot) => {   
+                        // console.log(snapshot);    
+                        snapshot.forEach(element => {
+                          if(element.key !== 'CAB-024'){
+                            lista.push({title: element.key, id: i});
+                            i = i + 1;
+                          }
+                          // console.log(element.key);
+                        });
+                      })
+                      .catch(function (err) {});
+                    // console.log(lista);
+                    navigation.navigate('Conceptos', {
+                      folio: folio, lista: lista, tipoFolio:tipoFolio
+                    });
+                  }}
+                  style={{ width: "65%" }}
+                >
+                  <View style={styles.contenedorBlanco}>
+                    <Iconos name="conceptos" size={32}></Iconos>
+                  </View>
+                </TouchableWithoutFeedback>
+              </View>
+              <View style={styles.contenedorTexto}>
+                <Text style={{ fontWeight: "bold", fontSize: 15 }}>Conceptos</Text>
+              </View>
+            </View> : null
+          }
         </View>
       );  
   };

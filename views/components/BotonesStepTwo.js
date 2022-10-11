@@ -29,8 +29,9 @@ const BotonesStepTwo = (props) => {
   const navigation = useNavigation();
   const db = getDatabase();
   const auth = getAuth();
-  const folio = props.folio;
-  const tipoFolio = props.tipoFolio;
+  const [infoData, setInfoData] = useState(props.infoData);
+  // const folio = props.folio;
+  // const tipoFolio = props.tipoFolio;
 
   const Iconos = createIconSetFromIcoMoon(
     require("../../icons/selection.json"),
@@ -59,8 +60,9 @@ const BotonesStepTwo = (props) => {
             style={{ borderRadius: 50 }}
             onPress={() => {
               navigation.navigate("Observaciones", {
-                folio: folio,
-                tipoFolio: tipoFolio,
+                folio: infoData.folio,
+                tipoFolio: infoData.tipoFolio,
+                incidencia: props.incidencia
               });
             }}
           >
@@ -88,8 +90,8 @@ const BotonesStepTwo = (props) => {
               let fecha = (dia < 10 ?  '0' + dia.toString() : dia.toString()) + '/' + (mes < 10 ?  '0' + mes.toString() : mes.toString()) + '/' + anio.toString();
               let horario = (hora < 10 ?  '0' + hora.toString() : hora.toString()) + ':' + (minuto < 10 ?  '0' + minuto.toString() : minuto.toString());
               
-              set(child(ref(db), `folios/correctivos/${tipoFolio}/${folio}/estado`), 3);
-              set(child(ref(db), `folios/correctivos/${tipoFolio}/${folio}/horaActivacion`), {
+              // set(child(ref(db), `folios/correctivos/${infoData.tipoFolio}/${infoData.folio}/estado`), 3);
+              await set(child(ref(db), `folios/correctivos/${infoData.tipoFolio}/${infoData.folio}/horaActivacion`), {
                 fecha: fecha,
                 hora: horario
               });
