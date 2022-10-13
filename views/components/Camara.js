@@ -128,7 +128,7 @@ const Camara = (props) => {
                       {
                         height: windowHeight - 290,
                         width: windowWidth - 50,
-                        marginTop: 30,
+                        marginTop: 10,
                       },
                     ]}
                   ></Image>
@@ -142,7 +142,7 @@ const Camara = (props) => {
                 ref={camRef}
                 style={{
                   flex: 1,
-                  marginTop: 30,
+                  marginTop: 10,
                   alignItems: "center",
                   justifyContent: "flex-end",
                   width: windowWidth - 50,

@@ -42,12 +42,6 @@ const Correctivo = () => {
   const [cargado, setCargado] = useState(false);
   const mounted = useRef(false);
   Location.setGoogleApiKey("AIzaSyCL6SrNElBbvIVhJtW3t_K4cn8OasyznsQ");
-//   const [animation, setAnimation] = useState(new Animated.Value(0));
-//   const [animationO, setAnimationE] = useState(new Animated.Value(1));
-//   const [animation2, setAnimation2] = useState(new Animated.Value(50));
-//   const [animationO2, setAnimationE2] = useState(new Animated.Value(0));
-//   const [animation3, setAnimation3] = useState(new Animated.Value(50));
-//   const [animationO3, setAnimationE3] = useState(new Animated.Value(0));
 
   const database = getDatabase();
   const auth = getAuth();
@@ -56,8 +50,6 @@ const Correctivo = () => {
   const [infoData, setInfoData] = useState({});  //  Inicialización del objeto de control para almacenamiento de información.
   const [estado, setEstado] = useState(null);
   const [refresh, setRefresh] = useState(false);
-//   const [latitud, setLatitud] = useState('');
-//   const [longitud, setLongitud] = useState('');
 
   const [componente, setComponente] = useState(<></>);
   
@@ -128,12 +120,14 @@ const Correctivo = () => {
     infoData.latitud = '';
     infoData.longitud = '';
 
+    console.log(fechaSistemaInicio + " " + horaSistemaInicio + ":00");
+    console.log(tiempo[2] + "/" + tiempo[1] + "/" + tiempo[0] + " " + infoData.horaLlegada + ":00");
     let inicio = new Date(fechaSistemaInicio + " " + horaSistemaInicio + ":00");
     let llegada = new Date(tiempo[2] + "/" + tiempo[1] + "/" + tiempo[0] + " " + infoData.horaLlegada + ":00");
 
     let diferencia = llegada.getTime() - inicio.getTime();
     let minutos = 0;
-
+    console.log(diferencia);
     while (diferencia >= 60000) {
         minutos = minutos + 1;
         diferencia = diferencia - 60000;

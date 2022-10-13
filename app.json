@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Sios App",
-    "slug": "SiosAppMobileV2",
+    "slug": "sios-app",
     "version": "2.23.2",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -13,10 +13,10 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.ioscomunicaciones.movil"
+      "bundleIdentifier": "com.ioscomunicaciones.siosapp"
     },
     "android": {
-      "package": "com.ioscomunicaciones.movil",
+      "package": "com.ioscomunicaciones.siosapp",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"

@@ -105,8 +105,8 @@ const StepOne = (props) => {
                   hora < 10 ?  '0' + hora.toString() : hora.toString(), 
                   minuto < 10 ?  '0' + minuto.toString() : minuto.toString()
                 ],
-                fechaSistema,
-                hora
+                infoData.fechaInicioSistema,
+                infoData.horaInicio
               );
           }}
         >

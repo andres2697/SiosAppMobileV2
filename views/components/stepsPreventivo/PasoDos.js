@@ -289,7 +289,6 @@ const PasoDos = (props) => {
     infoData.latitud = latitud;
     infoData.longitud = longitud;
     setInfoData(infoData);
-    console.log(infoData);
   };
 
   const fotoTomadaAntes = (foto) => {
@@ -522,7 +521,7 @@ const PasoDos = (props) => {
                             style={styles.botonAgregar}
                             onPress={() => {
                               Alert.alert(
-                                "Foto Antes",
+                                "Foto Durante",
                                 "¿Cómo quiere subir la imágen?",
                                 [
                                   {
@@ -604,7 +603,7 @@ const PasoDos = (props) => {
                         style={styles.botonAgregar}
                         onPress={() => {
                           Alert.alert(
-                            "Foto Antes",
+                            "Foto Después",
                             "¿Cómo quiere subir la imágen?",
                             [
                               {

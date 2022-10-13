@@ -46,6 +46,7 @@ const PasoUno = (props) => {
   const [burbuja3, setBurbuja3] = useState(props.burbuja3);
   const [linea1, setLinea1] = useState(props.linea1);
   const [linea2, setLinea2] = useState(props.linea2);
+  // const [cargando, setCargando] = useState(false);
   // const folio = props.folio;
   // const tipoFolio = props.tipoFolio;
 
@@ -67,6 +68,8 @@ const PasoUno = (props) => {
     infoData.latitud = "";
     infoData.longitud = "";
 
+    console.log(fechaSistemaInicio + " " + horaSistemaInicio + ":00");
+    console.log(tiempo[2] + "/" + tiempo[1] + "/" + tiempo[0] + " " + infoData.horaLlegada + ":00");
     let inicio = new Date(fechaSistemaInicio + " " + horaSistemaInicio + ":00");
     let llegada = new Date(
       tiempo[2] +
@@ -81,13 +84,12 @@ const PasoUno = (props) => {
 
     let diferencia = llegada.getTime() - inicio.getTime();
     let minutos = 0;
-
+    console.log(diferencia);
     while (diferencia >= 60000) {
       minutos = minutos + 1;
       diferencia = diferencia - 60000;
     }
-    infoData.eta.tiempo =
-      "00:" + (minutos < 10 ? "0" + minutos.toString() : minutos.toString());
+    infoData.eta.tiempo = minutos < 10 ? "0" + minutos.toString() : minutos.toString();
     infoData.eta.color = minutos > 30 ? "red" : "transparent";
 
     await update(
@@ -104,7 +106,7 @@ const PasoUno = (props) => {
     ).then((snapshot) => {
       // console.log(infoData);
     });
-    setInfoData(infoData);
+    // setCargando(false);
     props.callback(infoData, 2);
   };
 

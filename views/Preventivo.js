@@ -54,6 +54,8 @@ const Preventivo = (props) => {
   const navigation = useNavigation();
   const route = useRoute();
   const [cargado, setCargado] = useState(false);
+  const [cargando, setCargando] = useState(false);
+
   // const [mounted, setMounted] = useState(false);
   const mounted = useRef(false);
   Location.setGoogleApiKey("AIzaSyCL6SrNElBbvIVhJtW3t_K4cn8OasyznsQ");
@@ -77,9 +79,14 @@ const Preventivo = (props) => {
 
   const [tituloPagina, setTituloPagina] = useState("");
 
-  const manejarFolioCloud = httpsCallable(functions, "manejarFolio");
-  const asignarFolioCloud = httpsCallable(functions, "colaFoliosPreventivos");
+  const manejarFolioCloud = httpsCallable(functions, "manejarFolio"); // Función manejarFolio() de Cloud functions de Firebase
+  const asignarFolioCloud = httpsCallable(functions, "colaFoliosPreventivos"); // Función colaFoliosPreventivos() de Cloud functions de Firebase
 
+//--------------------------------------------------------------//
+//  Función que devuelve el Skeleton (componente de carga)      //
+//  mientras la lista de folios es cargada desde la             //
+//  base de datos.                                              //
+//--------------------------------------------------------------//
   function MySkeleton() {
     return (
       <MotiView
@@ -131,6 +138,10 @@ const Preventivo = (props) => {
     );
   }
 
+//--------------------------------------------------------------//
+//  Función ejecutada al actualizar (deslizar hacia abajo) la   //
+//  lista de los folios pendientes del técnico.                 //
+//--------------------------------------------------------------//
   const pullingView = async() => {
     setRefresh(true);
     let listaTemporal = await recargarLista();
@@ -147,6 +158,11 @@ const Preventivo = (props) => {
     clearTimeout();
   };
 
+//--------------------------------------------------------------//
+//  Función ejecutada por la función asincrona pullingView()    //
+//  para realizar nuevamente la consulta de la cola de          //
+//  folios pendientes en la base de datos                       //
+//--------------------------------------------------------------//
   const recargarLista = async() => {
     let ruta = {
       pendientes: `foliosAsignados/preventivos/pendientes/${auth.currentUser.uid}`,
@@ -172,8 +188,12 @@ const Preventivo = (props) => {
     }
     return listaTemporal;
   }
-
+//--------------------------------------------------------------//
+//  Función encargada de cambiar el estado del folio al 1       //
+//  y cambiar los colores del Timeline.                         //
+//--------------------------------------------------------------//
   const actualizarInfoPaso1 = (info, paso) => {
+    setEstado(5);
     setBurbuja1('#2166E5');
     setLinea1('#2166E5');
     setBurbuja2('#2166E5');
@@ -181,24 +201,37 @@ const Preventivo = (props) => {
     setBurbuja3('black');
     setInfoData(info);
     setEstado(paso);
+    // console.log(infoData);
   }
-
+//--------------------------------------------------------------//
+//  Función encargada de cambiar el estado del folio al 2       //
+//  y cambiar los colores del Timeline.                         //
+//--------------------------------------------------------------//
   const actualizarInfoPaso2 = (info, paso) => {
+    setEstado(5);
     setBurbuja1('#2166E5');
     setLinea1('#2166E5');
     setBurbuja2('#2166E5');
     setLinea2('#2166E5');
     setBurbuja3('#2166E5');
-    setEstado(paso);
     setInfoData(info);
+    setEstado(paso);
   }
+//--------------------------------------------------------------//
+//  Función encargada de cambiar el estado del folio al 3       //
+//  y cambiar los colores del Timeline.                         //
+//--------------------------------------------------------------//
   const actualizarInfoPaso3 = (info, paso) => {
+    setEstado(5);
     setInfoData(info);
     setEstado(paso);
     console.log(estado);
   }
-  //----------------------------------------------
 
+  //--------------------------------------------------------------//
+  //  Función encargada de redireccionar al Dashboard una vez     //
+  //  acabado el proceso del folio preventivo.                    //
+  //--------------------------------------------------------------// 
   const redireccionar = async () => {
     setTituloPagina('');
     await manejarFolioCloud({
@@ -226,8 +259,6 @@ const Preventivo = (props) => {
         console.log(`Error: ${error}`);
       });
   };
-
-
 
   //--------------------------------------------------------------//
   //  Función encargada de almacenar en el objeto 'infoData' la   //
@@ -461,164 +492,83 @@ const Preventivo = (props) => {
     if (mounted.current) {
       return (
         <View style={styles.contenedorPrincipal}>
-            <View style={[styles.contenedorTitulo, {width:'100%', marginBottom:20}]}>
-              <View style={{width:'100%', marginTop:2, marginLeft:10}}>
-                <Text style={styles.titulo}>{tituloPagina}</Text>
-              </View>
+          <View style={[styles.contenedorTitulo, {width:'100%', marginBottom:20}]}>
+            <View style={{width:'100%', marginTop:2, marginLeft:10}}>
+              <Text style={styles.titulo}>{tituloPagina}</Text>
             </View>
-            {
-              (()=>{
-                if(estado == 0){
-                  return(
-                    <>
-                      <ScrollView 
-                        refreshControl={
-                          <RefreshControl
-                            refreshing={refresh}
-                            onRefresh={()=>pullingView()}
-                          />
-                      }
-                      >
-                        <View style={{ width: '100%', height:'auto', flexDirection:'column', marginBottom: 15, justifyContent:"center", paddingLeft:10 }}>
-                          {
-                            listaFolios.map((folio) => (
-                              <View key={folio.folio} style={{ width: '100%', height:'auto', flexDirection:'row', marginBottom: 15, justifyContent:"center", paddingLeft:10 }}>
-                                <View style={{width:'40%', justifyContent:"center"}}>
-                                  <Text style={{fontSize: 16, fontWeight: '600'}}> {folio.folio} </Text>
-                                </View>
-                                <View style={{ width: '50%', alignSelf:"center", height: 50, paddingLeft:10 }}>
-                                  <Pressable
-                                    style={styles.button}
-                                    onPress={async()=> {
-                                      await get(child(
-                                        ref(database),
-                                        `folios/preventivos/${folio.tipoFolio}/${folio.folio}`
-                                      ))
-                                      .then((snapshot) => {
-                                        // console.log(snapshot);
-                                        if(infoData.folio != folio.folio){
-                                          infoData.folio = folio.folio;
-                                          infoData.tipoFolio = folio.tipoFolio;
-                                          snapshot.forEach((folioPresionado) => {
-                                            switch (folioPresionado.key) {
-                                              case "distrito":
-                                                infoData.distrito = folioPresionado.val();
-                                                break;
-                                              case "cluster":
-                                                infoData.cluster = folioPresionado.val();
-                                                break;
-                                              case "falla":
-                                                infoData.falla = folioPresionado.val();
-                                                break;
-                                              case "causa":
-                                                infoData.causa = folioPresionado.val();
-                                                break;
-                                              case "clientesAfectados":
-                                                infoData.clientesAfectados = folioPresionado.val();
-                                                break;
-                                            }
-                                          });
-                                          setInfoData(infoData);
-                                        }
-                                        setModalVisible(true);
-                                      });
-                                    }}
-                                  >
-                                    <Text style={[styles.buttonText]}>Ver</Text>
-                                  </Pressable>
-                                </View>
+          </View>
+          {
+            (()=>{
+              if(estado == 0){
+                return(
+                  <>
+                    <ScrollView 
+                      refreshControl={
+                        <RefreshControl
+                          refreshing={refresh}
+                          onRefresh={()=>pullingView()}
+                        />
+                    }
+                    >
+                      <View style={{ width: '100%', height:'auto', flexDirection:'column', marginBottom: 15, justifyContent:"center", paddingLeft:10 }}>
+                        {
+                          listaFolios.map((folio) => (
+                            <View key={folio.folio} style={{ width: '100%', height:'auto', flexDirection:'row', marginBottom: 15, justifyContent:"center", paddingLeft:10 }}>
+                              <View style={{width:'40%', justifyContent:"center"}}>
+                                <Text style={{fontSize: 16, fontWeight: '600'}}> {folio.folio} </Text>
                               </View>
-                            ))
-                          }
-                        </View>
-                      </ScrollView>
-                      <Modal
-                        animationType='slide'
-                        transparent={true}
-                        visible={modalVisible}
-                        onRequestClose={() => {
-                          setModalVisible(false);
-                        }}>
-                        <View style={styles.centeredView}>
-                          <View style={styles.modalView}>
-                            <InfoExtraEstatico
-                              style={{ height: "auto" }}
-                              infoData={infoData}
-                            ></InfoExtraEstatico>
-                            <View style={{flexDirection: 'row', justifyContent:'space-between', marginTop:40}}>
-                              <TouchableOpacity
-                                style={[styles.buttonClose]}
-                                onPress={()=>{setModalVisible(!modalVisible)}}
-                                keyboardShouldPersistTaps='always'
-                              >
-                                <Text style={styles.buttonCloseText}>Cerrar</Text>
-                              </TouchableOpacity>
-                              <TouchableOpacity
-                              style={[styles.button]}
-                              onPress={async()=>{
-                                infoData.eta = {
-                                  tiempo: "--:--",
-                                  color: "transparent",
-                                };
-                                infoData.sla = {
-                                  tiempo: "--:--",
-                                  color: "transparent",
-                                };
-                                let dia = new Date().getDate(serverTimestamp());
-                                let mes = new Date().getMonth(serverTimestamp()) + 1;
-                                let anio = new Date().getFullYear(serverTimestamp());
-                                
-                                let hora = new Date().getHours(serverTimestamp());
-                                let minuto = new Date().getMinutes(serverTimestamp());
-        
-                                let fechaScript = (dia < 10 ?  '0' + dia.toString() : dia.toString()) + '/' + (mes < 10 ?  '0' + mes.toString() : mes.toString()) + '/' + anio.toString();
-                                let fechaSistema = anio.toString() + '/' + (mes < 10 ?  '0' + mes.toString() : mes.toString()) + '/' + (dia < 10 ?  '0' + dia.toString() : dia.toString());
-                                let horario = (hora < 10 ?  '0' + hora.toString() : hora.toString()) + ':' + (minuto < 10 ?  '0' + minuto.toString() : minuto.toString());
-        
-                                await update(child(ref(database), `folios/preventivos/${infoData.tipoFolio}/${infoData.folio}`), {
-                                  estado: 1, 
-                                  horaInicio: {
-                                    fechaScript: fechaScript,
-                                    fechaSistema: fechaSistema,
-                                    hora: horario
-                                  },
-                                  estatus: 1 
-                                });
-                                await asignarFolioCloud({
-                                  folio: infoData.folio,
-                                  tecnico: auth.currentUser.uid,
-                                  estado: 1,
-                                  estatus: 1,
-                                  incidencia: 1,
-                                  tipoFolio: infoData.tipoFolio,
-                                  desplazar: true
-                                })
-                                .catch((error) => {
-                                  console.log(error.code, error.message, error.details);
-                                  console.log(`Error: ${error}`);
-                                });
-                                infoData.horaInicio = fechaScript;
-                                infoData.fechaInicio = horario;
-                                setInfoData(infoData);
-                                // mounted.current = false;
-                                setModalVisible(false);
-                                setListaFolios([]);
-                                setEstado(1);
-                              }}
-                              keyboardShouldPersistTaps='always'
-                            >
-                              <Text style={styles.buttonText}>Iniciar</Text>
-                            </TouchableOpacity>
+                              <View style={{ width: '50%', alignSelf:"center", height: 50, paddingLeft:10 }}>
+                                <Pressable
+                                  style={styles.button}
+                                  onPress={async()=> {
+                                    await get(child(
+                                      ref(database),
+                                      `folios/preventivos/${folio.tipoFolio}/${folio.folio}`
+                                    ))
+                                    .then((snapshot) => {
+                                      // console.log(snapshot);
+                                      if(infoData.folio != folio.folio){
+                                        infoData.folio = folio.folio;
+                                        infoData.tipoFolio = folio.tipoFolio;
+                                        snapshot.forEach((folioPresionado) => {
+                                          switch (folioPresionado.key) {
+                                            case "distrito":
+                                              infoData.distrito = folioPresionado.val();
+                                              break;
+                                            case "cluster":
+                                              infoData.cluster = folioPresionado.val();
+                                              break;
+                                            case "falla":
+                                              infoData.falla = folioPresionado.val();
+                                              break;
+                                            case "causa":
+                                              infoData.causa = folioPresionado.val();
+                                              break;
+                                            case "clientesAfectados":
+                                              infoData.clientesAfectados = folioPresionado.val();
+                                              break;
+                                          }
+                                        });
+                                        setInfoData(infoData);
+                                      }
+                                      setModalVisible(true);
+                                    });
+                                  }}
+                                >
+                                  <Text style={[styles.buttonText]}>Ver</Text>
+                                </Pressable>
+                              </View>
                             </View>
-                          </View>
-                        </View>
-                      </Modal>
-                    </>
-                  );
-                }else if(estado == 1){
-                  return(
-                    <ScrollView>
-                      <PasoUno 
+                          ))
+                        }
+                      </View>
+                    </ScrollView>
+                  </>
+                );
+              }else if(estado == 1){
+                return(
+                  <ScrollView>
+                    <PasoUno 
                       infoData={infoData}
                       burbuja1={burbuja1}
                       burbuja2={burbuja2}
@@ -626,54 +576,138 @@ const Preventivo = (props) => {
                       linea1={linea1}
                       linea2={linea2}
                       callback={actualizarInfoPaso1.bind(this)}
-                      ></PasoUno>
-                    </ScrollView>
-                  )
-                }else if(estado == 2){
-                  return(
-                    <ScrollView>
-                      <PasoDos
-                        infoData={infoData}
-                        burbuja1={burbuja1}
-                        burbuja2={burbuja2}
-                        burbuja3={burbuja3}
-                        linea1={linea1}
-                        linea2={linea2}
-                        callback={actualizarInfoPaso2.bind(this)}
-                      ></PasoDos>
-                    </ScrollView>
-                  );
-                }else if(estado == 3){
-                  return(
-                    <ScrollView>
-                      <PasoTres
-                        infoData={infoData}
-                        burbuja1={burbuja1}
-                        burbuja2={burbuja2}
-                        burbuja3={burbuja3}
-                        linea1={linea1}
-                        linea2={linea2}
-                        llamada={actualizarInfoPaso3.bind(this)}
-                      ></PasoTres>
-                    </ScrollView>
-                  );
-                }else if(estado == 4){
-                  return(
-                    <View style={{width: '100%', height:'100%', backgroundColor:'#ffffff', alignContent:"center", alignItems:"center", marginTop:'100%'}}>
-                      <ActivityIndicator size="large" color="#2166E5" style={{alignSelf:"center"}}></ActivityIndicator>
-                    </View>
-                  );
-                }else{
-                  return(<View></View>);
-                }
-              })()
-            }
+                    ></PasoUno>
+                  </ScrollView>
+                )
+              }else if(estado == 2){
+                return(
+                  <ScrollView>
+                    <PasoDos
+                      infoData={infoData}
+                      burbuja1={burbuja1}
+                      burbuja2={burbuja2}
+                      burbuja3={burbuja3}
+                      linea1={linea1}
+                      linea2={linea2}
+                      callback={actualizarInfoPaso2.bind(this)}
+                    ></PasoDos>
+                  </ScrollView>
+                );
+              }else if(estado == 3){
+                return(
+                  <ScrollView>
+                    <PasoTres
+                      infoData={infoData}
+                      burbuja1={burbuja1}
+                      burbuja2={burbuja2}
+                      burbuja3={burbuja3}
+                      linea1={linea1}
+                      linea2={linea2}
+                      llamada={actualizarInfoPaso3.bind(this)}
+                    ></PasoTres>
+                  </ScrollView>
+                );
+              }else if(estado == 4){
+                return(
+                  <View style={{width: '100%', height:'100%', backgroundColor:'#ffffff', alignContent:"center", alignItems:"center", marginTop:'100%'}}>
+                    <ActivityIndicator size="large" color="#2166E5" style={{alignSelf:"center"}}></ActivityIndicator>
+                  </View>
+                );
+              }else if(estado == 5){
+                <View style={{width: '100%', height:'100%', backgroundColor:'#ffffff', alignContent:"center", alignItems:"center"}}>
+                  <ActivityIndicator size="large" color="#2166E5" style={{alignSelf:"center", marginTop:'70%'}}></ActivityIndicator>
+                </View>
+              }else{
+                return(<View></View>);
+              }
+            })()
+          }
+          <Modal
+            animationType='slide'
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => {
+              setModalVisible(false);
+            }}>
+            <View style={styles.centeredView}>
+              <View style={styles.modalView}>
+                <InfoExtraEstatico
+                  style={{ height: "auto" }}
+                  infoData={infoData}
+                ></InfoExtraEstatico>
+                <View style={{flexDirection: 'row', justifyContent:'space-between', marginTop:40}}>
+                  <TouchableOpacity
+                    style={[styles.buttonClose]}
+                    onPress={()=>{setModalVisible(!modalVisible)}}
+                    keyboardShouldPersistTaps='always'
+                  >
+                    <Text style={styles.buttonCloseText}>Cerrar</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.button]}
+                    onPress={async()=>{
+                      infoData.eta = {
+                        tiempo: "--:--",
+                        color: "transparent",
+                      };
+                      infoData.sla = {
+                        tiempo: "--:--",
+                        color: "transparent",
+                      };
+                      infoData.horaInicio = '';
+                      infoData.fechaInicio = '';
+                      let dia = new Date().getDate(serverTimestamp());
+                      let mes = new Date().getMonth(serverTimestamp()) + 1;
+                      let anio = new Date().getFullYear(serverTimestamp());
+                      let hora = new Date().getHours(serverTimestamp());
+                      let minuto = new Date().getMinutes(serverTimestamp());
+                      let fechaScript = (dia < 10 ?  '0' + dia.toString() : dia.toString()) + '/' + (mes < 10 ?  '0' + mes.toString() : mes.toString()) + '/' + anio.toString();
+                      let fechaSistema = anio.toString() + '/' + (mes < 10 ?  '0' + mes.toString() : mes.toString()) + '/' + (dia < 10 ?  '0' + dia.toString() : dia.toString());
+                      // let horario = '09:00';
+                      let horario = (hora < 10 ?  '0' + hora.toString() : hora.toString()) + ':' + (minuto < 10 ?  '0' + minuto.toString() : minuto.toString());
+                      infoData.horaInicio = horario;
+                      infoData.fechaInicio = fechaScript;
+                      infoData.fechaInicioSistema = fechaSistema;
+                      setInfoData(infoData);
+                      await update(child(ref(database), `folios/preventivos/${infoData.tipoFolio}/${infoData.folio}`), {
+                        estado: 1, 
+                        horaInicio: {
+                          fechaScript: fechaScript,
+                          fechaSistema: fechaSistema,
+                          hora: horario
+                        },
+                        estatus: 1 
+                      });
+                      await asignarFolioCloud({
+                        folio: infoData.folio,
+                        tecnico: auth.currentUser.uid,
+                        estado: 1,
+                        estatus: 1,
+                        incidencia: 1,
+                        tipoFolio: infoData.tipoFolio,
+                        desplazar: true
+                      })
+                      .then(()=>{
+                        setModalVisible(false);
+                        setEstado(1);  
+                      })
+                      .catch((error) => {
+                        console.log(error.code, error.message, error.details);
+                        console.log(`Error: ${error}`);
+                      });
+                    }}
+                  >
+                    <Text style={styles.buttonText}>Iniciar</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </Modal>
         </View>
       );
     }else{
       return(
         <View style={styles.vistaSkeleton}>
-          {/* <ActivityIndicator size="large" color="#2166E5" style={{alignSelf:"center", marginTop:'100%'}}></ActivityIndicator> */}
           <MySkeleton></MySkeleton>
         </View>
       )
@@ -691,13 +725,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     alignSelf: "center",
     backgroundColor: "white",
-    // flexDirection: "row"
   },
   contenedorTitulo: {
     width: "100%",
     paddingTop: "5%",
     width: "85%",
-    // height: '',
     justifyContent: "flex-start",
     alignSelf: "center",
   },
@@ -749,7 +781,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   modalView: {
-    // top: '100%',
     width: '95%',
     height: 490,
     backgroundColor: 'whitesmoke',
