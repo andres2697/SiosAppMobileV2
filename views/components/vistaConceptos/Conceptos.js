@@ -23,6 +23,7 @@ const Conceptos = (props) => {
   const folio = props.route.params.folio;
   const tipoFolio = props.route.params.tipoFolio;
   let lista = props.route.params.lista;
+  const incidencia = props.route.params.incidencia;
   const [conceptos, setConceptos] = useState(new Array());
   const [listaConceptos, setListaConceptos] = useState(new Array());
 
@@ -42,7 +43,7 @@ const Conceptos = (props) => {
     let consulta1 = await get(
       child(
         ref(db),
-        `folios/correctivos/${tipoFolio}/${folio}/conceptosUsados`
+        `folios/${incidencia}/${tipoFolio}/${folio}/conceptosUsados`
       )
     )
       .then((snapshot) => {
@@ -58,12 +59,8 @@ const Conceptos = (props) => {
         });
       })
       .catch(function (err) {});
-
-      // console.log(arreglo2);
       arreglo2.forEach((valor) => {
         lista = lista.filter((element)=>{
-          // console.log('Lista: ');
-          // console.log(lista);
           if(element.title != valor.titulo){
             return element;
           };
@@ -117,6 +114,7 @@ const Conceptos = (props) => {
             folio={folio}
             lista={listaConceptos}
             conceptos={conceptos}
+            incidencia={incidencia}
             // conceptosBD={conceptosBD}
             tamanio={index}
             tipoFolio={tipoFolio}

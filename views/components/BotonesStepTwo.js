@@ -24,13 +24,15 @@ import {
 import moment, { min } from "moment";
 
 import { getAuth } from "firebase/auth";
+import LottieView from 'lottie-react-native';
 
 const BotonesStepTwo = (props) => {
   const navigation = useNavigation();
   const db = getDatabase();
   const auth = getAuth();
   const [infoData, setInfoData] = useState(props.infoData);
-  // const folio = props.folio;
+  const [cargando, setCargando] = useState(false);
+    // const folio = props.folio;
   // const tipoFolio = props.tipoFolio;
 
   const Iconos = createIconSetFromIcoMoon(
@@ -74,12 +76,15 @@ const BotonesStepTwo = (props) => {
 
         <View style={{ width: "40%", marginBottom: 20, alignSelf: "center" }}>
           <Button
-            mode="contained"
-            color="#2166E5"
+            mode={!cargando ? 'contained' : 'text'}
+            color={"#2166E5"}
             uppercase={false}
-            style={{ borderRadius: 50, elevation: 5 }}
+            disabled={cargando}
+            loading={cargando}
+            style={[{ borderRadius: 50 }, !cargando ? {elevation: 5} : {}]}
             onPress={async() => {
               // console.log("hola");
+              setCargando(true);
               let dia = new Date().getDate(serverTimestamp());
               let mes = new Date().getMonth(serverTimestamp()) + 1;
               let anio = new Date().getFullYear(serverTimestamp());
@@ -95,16 +100,28 @@ const BotonesStepTwo = (props) => {
                 fecha: fecha,
                 hora: horario
               });
-            
+              setCargando(false);
               props.callback(
                 -50, 0, 
                 ["#2166E5", "#2166E5","#2166E5", "#2166E5", "#2166E5"],
               );
             }}
           >
-            <Text style={{ fontSize: 17, fontFamily: "Urbanist_400Regular" }}>
-              Terminé
-            </Text>
+            {
+              (()=>{
+                if(cargando){
+                  return(
+                    <LottieView source={require('../../assets/loader.json')} autoPlay loop></LottieView>
+                  );
+                }else{
+                  return(
+                    <Text style={{ fontSize: 17, fontFamily: "Urbanist_400Regular" }}>
+                      Terminé
+                    </Text>
+                  );
+                }
+              })()
+            }
           </Button>
         </View>
       </View>

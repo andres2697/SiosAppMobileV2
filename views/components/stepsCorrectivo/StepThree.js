@@ -21,12 +21,14 @@ import {
   import { useFonts, Urbanist_400Regular } from "@expo-google-fonts/urbanist";
   import { getDatabase, child, get, ref, update } from 'firebase/database';
   import { getFunctions, httpsCallable } from "firebase/functions";
+  import LottieView from 'lottie-react-native';
   
   const StepThree = (props) => {
     const navigation = useNavigation();
     const database = getDatabase();
     const functions = getFunctions();
     const [infoData, setInfoData] = useState(props.infoData);
+    const [cargando, setCargando] = useState(false);
   
     const Iconos = createIconSetFromIcoMoon(
       require("../../../icons/selection.json"),
@@ -48,19 +50,33 @@ import {
       <View>
         <View style={{ width: "100%", marginTop: 40, marginBottom: 15, flex: 0 }}>
           <TouchableOpacity
-            style={[styles.button]}
+            disabled={cargando}
+            style={[!cargando ? styles.button : styles.hideButton]}
             onPress={async () => {
-              // console.log('hola desde componente 3');
+              setCargando(true);
               let incidencia = props.incidencia == 1 ? `preventivos` : `correctivos`;
               let ruta = `folios/${incidencia}/${infoData.tipoFolio}/${infoData.folio}`;
               await update(child(ref(database), `folios/correctivos/${infoData.tipoFolio}/${infoData.folio}`), {
                 estatus: 4,
               }).then((snapshot)=>{
               });
+              setCargando(false);
               props.callback();
             }}
           >
-            <Text style={styles.buttonText}>Confirmar</Text>
+            {
+              (()=>{
+                if(cargando){
+                  return(
+                    <LottieView source={require('../../../assets/loader.json')} autoPlay loop></LottieView>
+                  );
+                }else{
+                  return(
+                    <Text style={styles.buttonText}>Confirmar</Text>
+                  );
+                }
+              })()
+            }
           </TouchableOpacity>
         </View>
       </View>
@@ -84,6 +100,20 @@ import {
       borderRadius: 20,
       height: 45,
       elevation: 6,
+    },
+    hideButton: {
+      flex: 0,
+      width: "50%",
+      alignSelf: "center",
+    //   justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: "white",
+      paddingTop: 10,
+      paddingBottom: 10,
+      paddingLeft: 20,
+      paddingRight: 20,
+      borderRadius: 20,
+      height: 60,
     },
     buttonText: {
       color: "white",

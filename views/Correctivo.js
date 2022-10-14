@@ -530,9 +530,10 @@ const llenarCoordenadas = (latitud, longitud) =>{
                                 infoData={infoData}
                                 estado={estado}
                                 callback={llenarCoordenadas.bind(this)}
+                                incidencia={2}
                             ></StepTwo>
                         </View>
-                        <Herramientas folio={infoData.folio} tipoFolio={infoData.tipoFolio}></Herramientas>
+                        <Herramientas folio={infoData.folio} tipoFolio={infoData.tipoFolio} incidencia={2}></Herramientas>
                         <MaterialesConcepto folio={infoData.folio} tipoFolio={infoData.tipoFolio} incidencia={2}></MaterialesConcepto>
                         <BotonesStepTwo
                           callback={startAnimate2.bind(this)}

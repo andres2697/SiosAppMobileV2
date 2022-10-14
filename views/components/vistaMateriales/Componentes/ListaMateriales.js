@@ -29,6 +29,7 @@ import {
     const folio = props.folio;
     const tipoFolio = props.tipoFolio;
     const tipoMaterial = props.tipoMaterial;
+    const incidencia = props.incidencia;
     const [lista, setLista] = useState(props.lista);
     const [cantidad, setCantidad] = useState("1");
     const [habilitado, setHabilitado] = useState(true);
@@ -53,7 +54,7 @@ import {
         set(
           child(
           ref(db),
-          `folios/correctivos/${tipoFolio}/${folio}/materialesUsados/miscelaneos/${titulo}`
+          `folios/${incidencia}/${tipoFolio}/${folio}/materialesUsados/miscelaneos/${titulo}`
           ),
           null
         );
@@ -63,7 +64,7 @@ import {
         set(
           child(
           ref(db),
-          `folios/correctivos/${tipoFolio}/${folio}/materialesUsados/TP/${titulo}`
+          `folios/${incidencia}/${tipoFolio}/${folio}/materialesUsados/TP/${titulo}`
           ),
           null
         );
@@ -167,7 +168,6 @@ import {
                   tipoFolio={tipoFolio}
                   tipoMaterial={tipoMaterial}
                   lista={lista}
-                  // callback={detectarCambio.bind(this)}
                   valorMat={valorMat}
                   cantidadMat={cantidadMat}
                   setCantidadMat={setCantidadMat}
@@ -198,7 +198,6 @@ import {
                             cantidad: cantidadMat
                           }); 
                           setExcepcion(excepcion + 1);
-                          console.log(excepcion);
                           lista.forEach((item)=>{
                             if(item.title !== valorMat){
                               temp.push({title: item.title, id: x});
@@ -208,7 +207,7 @@ import {
                             set(
                                 child(
                                 ref(db),
-                                `folios/correctivos/${tipoFolio}/${folio}/materialesUsados/miscelaneos/${valorMat}`
+                                `folios/${incidencia}/${tipoFolio}/${folio}/materialesUsados/miscelaneos/${valorMat}`
                                 ),
                                 Number(cantidadMat)
                             );
@@ -239,7 +238,7 @@ import {
                               set(
                                   child(
                                   ref(db),
-                                  `folios/correctivos/${tipoFolio}/${folio}/materialesUsados/TP/${valorMat}`
+                                  `folios/${incidencia}/${tipoFolio}/${folio}/materialesUsados/TP/${valorMat}`
                                   ),
                                   Number(cantidadMat)
                               );

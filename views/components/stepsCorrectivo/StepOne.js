@@ -23,6 +23,7 @@ import { getDatabase, child, get, ref, serverTimestamp, set, update } from 'fire
 import moment, { min } from 'moment'
 
 import { getAuth } from 'firebase/auth';
+import LottieView from 'lottie-react-native';
 
 const StepOne = (props) => {
   const navigation = useNavigation();
@@ -31,7 +32,8 @@ const StepOne = (props) => {
   // const folio = props.folio;
   // const tipoFolio = props.tipoFolio;
   const [infoData, setInfoData] = useState(props.infoData);
-  // console.log(db.);
+  const [cargando, setCargando] = useState(false);
+    // console.log(db.);
   // var timerInicio = new Date();
   // const [dia, setDia] = useState(timerInicio.getDate());
   // const [mes, setMes] = useState(timerInicio.getMonth());
@@ -72,8 +74,10 @@ const StepOne = (props) => {
     <View>
       <View style={{ width: "100%", marginTop: 15, marginBottom: 15, flex: 0 }}>
         <TouchableOpacity
-          style={[styles.button]}
+          disabled={cargando}
+          style={[!cargando ? styles.button : styles.hideButton]}
           onPress={async () => {
+            setCargando(true);
             let incidencia = props.incidencia == 1 ? 'preventivos' : 'correctivos';
             let ruta = `folios/${incidencia}/${infoData.tipoFolio}/${infoData.folio}`;
             let dia = new Date().getDate(serverTimestamp());
@@ -96,7 +100,7 @@ const StepOne = (props) => {
               },
               estatus: 2 
             });
-            
+            setCargando(false);
             props.callback(
                 -50, 0, 
                 [ dia < 10 ?  '0' + dia.toString() : dia.toString(), 
@@ -110,7 +114,19 @@ const StepOne = (props) => {
               );
           }}
         >
-          <Text style={styles.buttonText}>Llegué a sitio</Text>
+          {
+              (()=>{
+                if(cargando){
+                  return(
+                    <LottieView source={require('../../../assets/loader.json')} autoPlay loop></LottieView>
+                  );
+                }else{
+                  return(
+                    <Text style={styles.buttonText}>Llegué a sitio</Text>
+                  );
+                }
+              })()
+            }
         </TouchableOpacity>
       </View>
     </View>
@@ -132,6 +148,20 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     height: 45,
     elevation: 6,
+  },
+  hideButton: {
+    flex: 0,
+    width: "50%",
+    alignSelf: "center",
+  //   justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "white",
+    paddingTop: 10,
+    paddingBottom: 10,
+    paddingLeft: 20,
+    paddingRight: 20,
+    borderRadius: 20,
+    height: 60,
   },
   buttonText: {
     color: "white",

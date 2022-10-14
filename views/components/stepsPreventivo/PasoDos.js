@@ -44,6 +44,7 @@ const PasoDos = (props) => {
   const database = getDatabase();
   const auth = getAuth();
   const storage = getStorage();
+  const incidencia = props.incidencia;
 
   const [infoData, setInfoData] = useState(props.infoData);
   const [burbuja1, setBurbuja1] = useState(props.burbuja1);
@@ -399,6 +400,7 @@ const PasoDos = (props) => {
                     infoData={infoData}
                     estado={2}
                     callback={llenarCoordenadas.bind(this)}
+                    incidencia={1}
                   ></StepTwo>
                 </View>
                 <View
@@ -578,6 +580,7 @@ const PasoDos = (props) => {
                 <Herramientas
                   folio={infoData.folio}
                   tipoFolio={infoData.tipoFolio}
+                  incidencia={1}
                 ></Herramientas>
                 <View style={{width:'100%', height:'auto', alignContent:"center", alignItems:"center", marginBottom:8, marginTop:15}}>
                   <Text style={{textAlign: "center", fontWeight:'bold', fontSize:16, marginBottom: 10}}>Después</Text>

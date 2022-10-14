@@ -589,6 +589,7 @@ const Preventivo = (props) => {
                       burbuja3={burbuja3}
                       linea1={linea1}
                       linea2={linea2}
+                      incidencia={1}
                       callback={actualizarInfoPaso2.bind(this)}
                     ></PasoDos>
                   </ScrollView>

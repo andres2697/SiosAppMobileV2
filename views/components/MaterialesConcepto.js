@@ -31,7 +31,7 @@
     const folio = props.folio;
     const tipoFolio = props.tipoFolio;
     const incidencia = props.incidencia;
-    const paddingIconos = incidencia == 1 ? 20 : 0;
+    const incidenciaString = props.incidencia == 1 ? 'preventivos' : 'correctivos';
 
     const Iconos = createIconSetFromIcoMoon(
       require("../../icons/selection.json"),
@@ -65,7 +65,7 @@
                   let consulta1 = await get(
                     child(
                       ref(db),
-                      `folios/correctivos/${tipoFolio}/${folio}/materialesUsados/miscelaneos`
+                      `folios/${incidenciaString}/${tipoFolio}/${folio}/materialesUsados/miscelaneos`
                     )
                   )
                     .then((snapshot) => {   
@@ -110,7 +110,7 @@
                   });
 
                   navigation.navigate('Miscelaneos', {
-                    folio: folio, lista: lista, tipoFolio: tipoFolio,
+                    folio: folio, lista: lista, tipoFolio: tipoFolio, incidencia: incidenciaString
                   });
 
                 }}
@@ -144,7 +144,7 @@
                   let consulta1 = await get(
                     child(
                       ref(db),
-                      `folios/correctivos/${tipoFolio}/${folio}/materialesUsados/TP`
+                      `folios/${incidenciaString}/${tipoFolio}/${folio}/materialesUsados/TP`
                     )
                   )
                     .then((snapshot) => {   
@@ -186,7 +186,7 @@
                   });
 
                   navigation.navigate('MaterialesTP', {
-                    folio: folio, lista: lista, tipoFolio: tipoFolio
+                    folio: folio, lista: lista, tipoFolio: tipoFolio, incidencia: incidenciaString
                   });
                 }}
                 style={{ width: "65%" }}
@@ -239,7 +239,7 @@
                       .catch(function (err) {});
                     // console.log(lista);
                     navigation.navigate('Conceptos', {
-                      folio: folio, lista: lista, tipoFolio:tipoFolio
+                      folio: folio, lista: lista, tipoFolio:tipoFolio, incidencia: incidenciaString
                     });
                   }}
                   style={{ width: "65%" }}

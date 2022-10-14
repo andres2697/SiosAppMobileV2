@@ -28,6 +28,7 @@ import {
 const EntradaConceptos = (props) => {
   const folio = props.folio;
   const tipoFolio = props.tipoFolio;
+  const incidencia = props.incidencia;
   const [conceptos, setConceptos] = useState(props.lista);
   const [listaConceptos, setLista] = useState(props.conceptos);
   let index = props.tamanio;
@@ -137,7 +138,7 @@ const EntradaConceptos = (props) => {
                     set(
                       child(
                       ref(db),
-                      `folios/correctivos/${tipoFolio}/${folio}/conceptosUsados/${item.titulo}`
+                      `folios/${incidencia}/${tipoFolio}/${folio}/conceptosUsados/${item.titulo}`
                       ),
                       null
                     );
@@ -201,7 +202,7 @@ const EntradaConceptos = (props) => {
               set(
                 child(
                   ref(db),
-                    `folios/correctivos/${tipoFolio}/${folio}/conceptosUsados/${conceptoSeleccionado}`
+                    `folios/${incidencia}/${tipoFolio}/${folio}/conceptosUsados/${conceptoSeleccionado}`
                 ),
                 Number(cantidad)
               );

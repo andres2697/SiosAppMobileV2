@@ -22,6 +22,7 @@ const Miscelaneos = (props) => {
   const folio = props.route.params.folio;
   const lista = props.route.params.lista;
   const tipoFolio = props.route.params.tipoFolio;
+  const incidencia = props.route.params.incidencia;
   const [materiales, setMateriales] = useState(new Array());
   const [index, setIndex] = useState(0);
   const db = getDatabase();
@@ -29,7 +30,7 @@ const Miscelaneos = (props) => {
 
   const cargarMateriales = useCallback(async()=>{
       let x = 0;
-      const variables = await get(child(ref(db), `folios/correctivos/${tipoFolio}/${folio}/materialesUsados/miscelaneos`))
+      const variables = await get(child(ref(db), `folios/${incidencia}/${tipoFolio}/${folio}/materialesUsados/miscelaneos`))
           .then((snapshot) => {
             // console.log(index);
             snapshot.forEach((element) => {
@@ -76,6 +77,7 @@ const Miscelaneos = (props) => {
           materiales={materiales} 
           tamanio={index} 
           tipoFolio={tipoFolio}
+          incidencia={incidencia}
         ></ListaMateriales>
     </View>
   );

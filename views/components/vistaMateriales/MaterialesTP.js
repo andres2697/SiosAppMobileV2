@@ -21,6 +21,7 @@
     const folio = props.route.params.folio;
     const lista = props.route.params.lista;
     const tipoFolio = props.route.params.tipoFolio;
+    const incidencia = props.route.params.incidencia;
     const [materiales, setMateriales] = useState(new Array());
     const [index, setIndex] = useState(0);
     const db = getDatabase();
@@ -28,7 +29,7 @@
 
   const cargarMateriales = useCallback(async()=>{
         let x = 0;
-        const variables = await get(child(ref(db), `folios/correctivos/${tipoFolio}/${folio}/materialesUsados/TP`))
+        const variables = await get(child(ref(db), `folios/${incidencia}/${tipoFolio}/${folio}/materialesUsados/TP`))
         .then((snapshot) => {
           snapshot.forEach((element) => {
               materiales.push({
@@ -68,7 +69,15 @@
   
     return (
       <View style={styles.contenedorPrincipal}>
-        <ListaMateriales folio={folio} tipoFolio={tipoFolio} tipoMaterial={2} lista={lista} materiales={materiales} tamanio={index}></ListaMateriales>
+        <ListaMateriales 
+          folio={folio} 
+          tipoFolio={tipoFolio} 
+          tipoMaterial={2} 
+          lista={lista} 
+          materiales={materiales} 
+          tamanio={index}
+          incidencia={incidencia}
+        ></ListaMateriales>
       </View>
     );
   };

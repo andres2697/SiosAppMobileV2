@@ -27,7 +27,7 @@ import * as Location from 'expo-location';
 const StepTwo = (props) => {
   const database = getDatabase();
   const navigation = useNavigation();
-  
+  const incidencia = props.incidencia == 1 ? 'preventivos' : 'correctivos';
   const [infoData, setInfoData] = useState(props.infoData);
   const [latitud, setLatitud] = useState(infoData.latitud === undefined ? null : infoData.latitud);
   const [longitud, setLongitud] = useState(infoData.longitud === undefined ? null : infoData.longitud);
@@ -55,7 +55,7 @@ const StepTwo = (props) => {
       arregloTemporal.latitud = location.coords.latitude.toString();
       arregloTemporal.longitud = location.coords.longitude.toString();
       let coordenadas = arregloTemporal.latitud + "," + arregloTemporal.longitud;
-      await update(child(ref(database), `folios/correctivos/${infoData.tipoFolio}/${infoData.folio}`), {
+      await update(child(ref(database), `folios/${incidencia}/${infoData.tipoFolio}/${infoData.folio}`), {
           coordenada: coordenadas
       }).then((snapshot)=>{});
       setLatitud(arregloTemporal.latitud);

@@ -28,6 +28,7 @@ const Herramientas = (props) => {
   const auth = getAuth();
   const folio = props.folio;
   const tipoFolio = props.tipoFolio;
+  const incidencia = props.incidencia == 1 ? 'preventivos' : 'correctivos';
 
   const navigation = useNavigation();
   const [potenciaInicial, setPotenciaInicial] = useState("");
@@ -43,7 +44,7 @@ const Herramientas = (props) => {
     const variable1 = await get(
       child(
         ref(db),
-        `folios/correctivos/${tipoFolio}/${folio}/potencias`,
+        `folios/${incidencia}/${tipoFolio}/${folio}/potencias`,
         limitToFirst(1)
       )
     )
@@ -68,7 +69,7 @@ const Herramientas = (props) => {
     const variables = await get(
       child(
         ref(db),
-        `folios/correctivos/${tipoFolio}/${folio}/potencias/potenciaInicial`,
+        `folios/${incidencia}/${tipoFolio}/${folio}/potencias/potenciaInicial`,
         limitToFirst(1)
       )
     )
@@ -119,7 +120,7 @@ const Herramientas = (props) => {
     set(
       child(
         ref(db),
-        `folios/correctivos/${tipoFolio}/${folio}/potencias/horaMedicion`
+        `folios/${incidencia}/${tipoFolio}/${folio}/potencias/horaMedicion`
       ),
       escribirHorario
     );
@@ -191,7 +192,7 @@ const Herramientas = (props) => {
                   set(
                     child(
                       ref(db),
-                      `folios/correctivos/${tipoFolio}/${folio}/potencias/potenciaInicial`
+                      `folios/${incidencia}/${tipoFolio}/${folio}/potencias/potenciaInicial`
                     ),
                     potenciaInicial
                   );
@@ -204,7 +205,7 @@ const Herramientas = (props) => {
                     set(
                       child(
                         ref(db),
-                        `folios/correctivos/${tipoFolio}/${folio}/potencias/potenciaInicial`
+                        `folios/${incidencia}/${tipoFolio}/${folio}/potencias/potenciaInicial`
                       ),
                       potenciaInicial
                     );
@@ -212,7 +213,7 @@ const Herramientas = (props) => {
                     set(
                       child(
                         ref(db),
-                        `folios/correctivos/${tipoFolio}/${folio}/potencias/potenciaInicial`
+                        `folios/${incidencia}/${tipoFolio}/${folio}/potencias/potenciaInicial`
                       ),
                       null
                     );
@@ -247,7 +248,7 @@ const Herramientas = (props) => {
                   set(
                     child(
                       ref(db),
-                      `folios/correctivos/${tipoFolio}/${folio}/potencias/potenciaFinal`
+                      `folios/${incidencia}/${tipoFolio}/${folio}/potencias/potenciaFinal`
                     ),
                     potenciaFinal
                   );
@@ -260,7 +261,7 @@ const Herramientas = (props) => {
                     set(
                       child(
                         ref(db),
-                        `folios/correctivos/${tipoFolio}/${folio}/potencias/potenciaFinal`
+                        `folios/${incidencia}/${tipoFolio}/${folio}/potencias/potenciaFinal`
                       ),
                       potenciaFinal
                     );
@@ -268,7 +269,7 @@ const Herramientas = (props) => {
                     set(
                       child(
                         ref(db),
-                        `folios/correctivos/${tipoFolio}/${folio}/potencias/potenciaFinal`
+                        `folios/${incidencia}/${tipoFolio}/${folio}/potencias/potenciaFinal`
                       ),
                       null
                     );
@@ -338,7 +339,7 @@ const Herramientas = (props) => {
               set(
                 child(
                   ref(db),
-                  `folios/correctivos/${tipoFolio}/${folio}/potencias/horaMedicion`
+                  `folios/${incidencia}/${tipoFolio}/${folio}/potencias/horaMedicion`
                 ),
                 null
               );
